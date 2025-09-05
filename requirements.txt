@@ -2,7 +2,7 @@ flask==3.0.3
 flask-cors==4.0.0
 flask-sqlalchemy==3.1.1
 sqlalchemy==2.0.36
-psycopg2-binary==2.9.9
+psycopg[binary]==3.1.18
 stripe==10.5.0
 waitress==3.0.0
 python-dotenv==1.0.1
