@@ -18,11 +18,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
-
 # ---------- config ----------
 
 def _normalize_db_url(url: str) -> str:
-    # render may provide postgres:// or postgresql://; on py3.13 use psycopg3
+    # use psycopg3 driver on py3.13
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
     if url.startswith("postgresql://"):
@@ -38,47 +37,37 @@ if not STRIPE_SECRET_KEY:
     raise RuntimeError("STRIPE_SECRET_KEY is required")
 
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
-PRICE_ID = os.environ.get("PRICE_ID", "")  # e.g., price_...
-FRONTEND_URL = os.environ.get("FRONTEND_URL")  # e.g., https://calmprofile.vercel.app
+PRICE_ID = os.environ.get("PRICE_ID", "")
+FRONTEND_URL = os.environ.get("FRONTEND_URL")
 SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24).hex())
 
 stripe.api_key = STRIPE_SECRET_KEY
-
 
 # ---------- db setup ----------
 
 class Base(DeclarativeBase):
     pass
 
-
 class Assessment(Base):
     __tablename__ = "assessments"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     email: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
-    # optional json-ish blobs stored as text for portability
     data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-
 class Payment(Base):
     __tablename__ = "payments"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-
     assessment_id: Mapped[Optional[int]] = mapped_column(ForeignKey("assessments.id"), nullable=True)
-
     stripe_session_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
     stripe_payment_intent: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
     stripe_event_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
-
-    status: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)     # paid/unpaid/processing
+    status: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     currency: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
-    amount_total: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # cents
+    amount_total: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     customer_email: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -86,32 +75,25 @@ class Payment(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
     pool_recycle=300,
 )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
-
-# create tables on boot (ok for mvp; migrate later)
 Base.metadata.create_all(engine)
-
 
 # ---------- app ----------
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-# cors: restrict to frontend if provided, else allow all (dev)
 cors_origins = [FRONTEND_URL] if FRONTEND_URL else "*"
 CORS(app, resources={r"/*": {"origins": cors_origins}})
-
 
 @app.before_request
 def _open_session():
     g.db = SessionLocal()
-
 
 @app.teardown_request
 def _close_session(exc=None):
@@ -123,7 +105,6 @@ def _close_session(exc=None):
         finally:
             db.close()
 
-
 # ---------- helpers ----------
 
 def _frontend_base() -> str:
@@ -132,13 +113,10 @@ def _frontend_base() -> str:
         return origin
     if FRONTEND_URL:
         return FRONTEND_URL
-    # fallback (update to your vercel domain if you prefer hard lock)
     return "https://calmprofile.vercel.app"
-
 
 def _json(data, status=200):
     return jsonify(data), status
-
 
 # ---------- routes ----------
 
@@ -146,12 +124,10 @@ def _json(data, status=200):
 def root():
     return _json({"service": "calm.profile_api", "status": "ok"})
 
-# health
 @app.get("/health")
 def health():
     return _json({"ok": True, "time": datetime.utcnow().isoformat() + "Z"})
 
-# db connectivity smoke test
 @app.get("/db-check")
 def db_check():
     try:
@@ -161,7 +137,6 @@ def db_check():
     except Exception as e:
         return _json({"db": "error", "detail": str(e)}, status=500)
 
-# create checkout session
 @app.post("/create-checkout-session")
 def create_checkout_session():
     if not PRICE_ID:
@@ -190,7 +165,6 @@ def create_checkout_session():
             automatic_tax={"enabled": False},
         )
 
-        # record shell row for audit
         pay = Payment(
             assessment_id=int(assessment_id) if isinstance(assessment_id, (int, str)) and str(assessment_id).isdigit() else None,
             stripe_session_id=session.id,
@@ -207,7 +181,6 @@ def create_checkout_session():
         g.db.rollback()
         return _json({"error": str(e)}, status=400)
 
-# stripe webhooks
 @app.post("/webhooks/stripe")
 def stripe_webhook():
     payload = request.get_data(as_text=True)
@@ -228,7 +201,6 @@ def stripe_webhook():
     event_type = event["type"]
     event_id = event["id"]
 
-    # idempotency: ignore repeats
     existing_event = g.db.execute(
         select(Payment).where(Payment.stripe_event_id == event_id)
     ).scalar_one_or_none()
@@ -305,15 +277,12 @@ def stripe_webhook():
                 g.db.add(pay)
                 g.db.commit()
 
-        # acknowledge everything
         return _json({"received": True})
     except Exception as e:
         g.db.rollback()
         return _json({"error": str(e)}, status=500)
 
-
-# ---------- optional aliases to keep your existing frontend happy ----------
-
+# compatibility aliases
 @app.get("/api/health")
 def api_health_alias():
     return health()
@@ -321,9 +290,6 @@ def api_health_alias():
 @app.post("/api/create-checkout-session")
 def api_checkout_alias():
     return create_checkout_session()
-
-
-# ---------- main ----------
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")), debug=False)
