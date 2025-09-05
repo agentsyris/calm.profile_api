@@ -1,0 +1,301 @@
+import os
+from datetime import datetime
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+import json
+from uuid import uuid4
+
+# Import the unified scoring system
+from calm_profile_system import score_assessment, format_response
+
+load_dotenv()
+app = Flask(__name__)
+
+# Configure CORS
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:*", "http://127.0.0.1:*", "https://syris.systems"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
+
+# Database configuration
+db_url = os.getenv("DATABASE_URL", "sqlite:///calm_profile.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+
+class Assessment(db.Model):
+    """Store assessment results for future reference."""
+    __tablename__ = "assessments"
+    
+    id = db.Column(db.String(36), primary_key=True)
+    email = db.Column(db.String(255), index=True)
+    archetype_primary = db.Column(db.String(32))
+    archetype_mix = db.Column(db.JSON)
+    axis_scores = db.Column(db.JSON)
+    overhead_index = db.Column(db.Float)
+    hours_lost = db.Column(db.Float)
+    annual_cost = db.Column(db.Float)
+    raw_responses = db.Column(db.JSON)
+    metadata = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    report_sent = db.Column(db.Boolean, default=False)
+    payment_status = db.Column(db.String(20), default="pending")
+
+
+with app.app_context():
+    db.create_all()
+
+
+@app.route('/')
+def index():
+    """Serve the main application."""
+    return send_from_directory('static', 'index.html')
+
+
+@app.get("/api/health")
+def health():
+    """Health check endpoint."""
+    return jsonify({
+        "ok": True,
+        "time": datetime.utcnow().isoformat(),
+        "version": "2.0.0"
+    })
+
+
+@app.post("/api/assess")
+def create_assessment():
+    """
+    Process assessment responses and return profile results.
+    
+    Expected POST data:
+    {
+        "responses": {"0": "A", "1": "B", ...},
+        "meta": {
+            "team_size": "2-5",
+            "meetings": "7-10",
+            "platform": "microsoft"
+        }
+    }
+    """
+    try:
+        data = request.get_json(force=True)
+        
+        # Validate that we have responses
+        responses = data.get("responses", {})
+        if not responses:
+            return jsonify({
+                "success": False,
+                "error": "No responses provided"
+            }), 400
+        
+        # Validate that we have enough responses
+        response_count = sum(1 for i in range(20) if str(i) in responses)
+        if response_count < 20:
+            return jsonify({
+                "success": False,
+                "error": f"Incomplete assessment: {response_count}/20 questions answered"
+            }), 400
+        
+        # Score the assessment using unified system
+        profile = score_assessment(data)
+        
+        # Generate unique assessment ID
+        assessment_id = f"cp_{uuid4().hex[:8]}"
+        
+        # Format response for frontend
+        result = format_response(profile, assessment_id)
+        
+        # Save to database if email provided
+        email = data.get("email")
+        if email:
+            assessment = Assessment(
+                id=assessment_id,
+                email=email,
+                archetype_primary=profile.archetype["primary"],
+                archetype_mix=profile.archetype["mix"],
+                axis_scores=profile.scores["axes"],
+                overhead_index=profile.scores["overhead_index"],
+                hours_lost=profile.metrics["hours_lost_ppw"],
+                annual_cost=profile.metrics["annual_cost"],
+                raw_responses=responses,
+                meta_data=data.get("meta", {})  # Changed to match column name
+            )
+            db.session.add(assessment)
+            db.session.commit()
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        app.logger.error(f"Assessment error: {str(e)}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "Failed to process assessment"
+        }), 500
+
+
+@app.get("/api/assessment/<assessment_id>")
+def get_assessment(assessment_id):
+    """
+    Retrieve a saved assessment by ID.
+    """
+    try:
+        assessment = Assessment.query.get(assessment_id)
+        if not assessment:
+            return jsonify({
+                "success": False,
+                "error": "Assessment not found"
+            }), 404
+        
+        # Reconstruct the profile response
+        return jsonify({
+            "success": True,
+            "assessment_id": assessment.id,
+            "archetype": {
+                "primary": assessment.archetype_primary,
+                "mix": assessment.archetype_mix
+            },
+            "scores": {
+                **assessment.axis_scores,
+                "overhead_index": assessment.overhead_index
+            },
+            "metrics": {
+                "hours_lost_ppw": assessment.hours_lost,
+                "annual_cost": assessment.annual_cost
+            },
+            "created_at": assessment.created_at.isoformat()
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error retrieving assessment: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Failed to retrieve assessment"
+        }), 500
+
+
+# Stripe integration
+import stripe
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
+
+
+@app.post("/api/create-checkout")
+def create_checkout():
+    """
+    Create Stripe checkout session for report purchase.
+    """
+    data = request.get_json(force=True)
+    email = data.get("email")
+    assessment_id = data.get("assessment_id")
+    
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+    
+    if not assessment_id:
+        return jsonify({"error": "Assessment ID required"}), 400
+    
+    # Verify assessment exists
+    assessment = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+    
+    # Update assessment with email if not already set
+    if not assessment.email:
+        assessment.email = email
+        db.session.commit()
+    
+    success_url = os.getenv(
+        "CHECKOUT_SUCCESS_URL",
+        "http://localhost:5000/thank-you?session_id={CHECKOUT_SESSION_ID}"
+    )
+    cancel_url = os.getenv(
+        "CHECKOUT_CANCEL_URL",
+        "http://localhost:5000/"
+    )
+    
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            mode="payment",
+            customer_email=email,
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {
+                        "name": "calm.profile Diagnostic Report",
+                        "description": "Comprehensive 12-page operational assessment PDF + 30-minute strategy debrief call"
+                    },
+                    "unit_amount": 49500  # $495.00
+                },
+                "quantity": 1
+            }],
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "assessment_id": assessment_id,
+                "email": email
+            }
+        )
+        
+        return jsonify({
+            "success": True,
+            "checkout_url": session.url
+        })
+        
+    except stripe.error.StripeError as e:
+        app.logger.error(f"Stripe error: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Payment processing error"
+        }), 500
+
+
+@app.post("/api/webhook/stripe")
+def stripe_webhook():
+    """
+    Handle Stripe webhook events for payment confirmation.
+    """
+    payload = request.data
+    sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    
+    if not webhook_secret:
+        return jsonify({"error": "Webhook not configured"}), 500
+    
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+        
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            assessment_id = session['metadata'].get('assessment_id')
+            
+            if assessment_id:
+                assessment = Assessment.query.get(assessment_id)
+                if assessment:
+                    assessment.payment_status = "completed"
+                    db.session.commit()
+                    
+                    # TODO: Trigger report generation and email sending
+                    app.logger.info(f"Payment completed for assessment {assessment_id}")
+        
+        return jsonify({"received": True})
+        
+    except Exception as e:
+        app.logger.error(f"Webhook error: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", "5000"))
+    debug = os.getenv("FLASK_ENV") != "production"
+    app.run(host="0.0.0.0", port=port, debug=debug)

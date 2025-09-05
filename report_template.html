@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+ @page { size:A4; margin:28mm 24mm }
+ body { font-family: "Inter","JetBrains Mono",system-ui,sans-serif; color:#0a0a0a }
+ h1,h2{ font-weight:600; letter-spacing:-.02em } .dot{ color:#00c9a7 } .meta{ color:#767676; font-size:12px }
+ table{ width:100%; border-collapse:collapse } th,td{ padding:6px 8px; border-bottom:1px solid #eaeaea; text-align:left }
+</style></head><body>
+<h1>calm<span class="dot">.</span>profile — diagnostic</h1>
+<div class="meta">generated {{ now()() }}</div>
+
+<h2>archetype</h2>
+<p>primary: <strong>{{ archetype|title }}</strong></p>
+
+<h2>scores</h2>
+<table><thead><tr><th>axis</th><th>score</th></tr></thead><tbody>
+  {% for k,v in (scores or {}).items() %}<tr><td>{{k}}</td><td>{{v}}</td></tr>{% endfor %}
+</tbody></table>
+
+<h2>recommendations</h2>
+<ol>
+  {% if recommendations %}{% for r in recommendations %}<li>{{r}}</li>{% endfor %}
+  {% else %}
+  <li>consolidate project tracking to a single source of truth.</li>
+  <li>introduce a weekly planning cadence + request queue.</li>
+  <li>protect maker time with async-first comms window.</li>
+  {% endif %}
+</ol>
+
+<p class="meta">syrıs<span class="dot">.</span> — calm in the chaos of creative work</p>
+</body></html>

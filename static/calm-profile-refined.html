@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>calm.profile — syris.</title>
+    <meta name="description" content="Operational assessment for creative teams. Behavior-based diagnostic. Measurable results.">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-L55FL9F71T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-L55FL9F71T');
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00C9A7;
+            --black: #000000;
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F0F0F0;
+            --gray-200: #E5E5E5;
+            --gray-400: #999999;
+            --gray-600: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        ::selection {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--black);
+            line-height: 1.5;
+            background: var(--white);
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+        
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 16px 32px;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--black);
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--black);
+        }
+        
+        .nav-cta {
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border: 1px solid var(--black);
+            color: var(--black);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+        
+        .nav-cta:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* Container */
+        .container {
+            max-width: 580px;
+            margin: 0 auto;
+            padding: 100px 32px 64px;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 1px;
+            background: var(--gray-100);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 1px;
+            background: var(--black);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+        
+        .progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--gray-400);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        /* Intro */
+        .intro {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+            animation-delay: 0.1s;
+        }
+        
+        .intro-sub {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--gray-600);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .intro-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 300;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 28px;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 11px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: 1px solid var(--black);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.15s ease;
+            letter-spacing: 0.03em;
+            text-transform: lowercase;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: var(--white);
+            color: var(--black);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            border-color: var(--gray-600);
+            color: var(--black);
+        }
+
+        /* Questions */
+        .question-section {
+            display: none;
+            opacity: 0;
+        }
+        
+        .question-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .question-context {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+        }
+        
+        .question-statement {
+            font-size: 17px;
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: 28px;
+            color: var(--black);
+            letter-spacing: -0.01em;
+        }
+
+        /* Binary Choice */
+        .choice-container {
+            margin-bottom: 40px;
+        }
+        
+        .choice-option {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 8px;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+            border: 1px solid var(--gray-100);
+            border-radius: 4px;
+            background: transparent;
+            color: var(--black);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .choice-option:hover {
+            border-color: var(--gray-400);
+            background: var(--gray-50);
+        }
+        
+        .choice-option.selected {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+        
+        .choice-letter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.4;
+        }
+        
+        .choice-option.selected .choice-letter {
+            opacity: 0.6;
+        }
+
+        /* Meta Section */
+        .meta-section {
+            display: none;
+            opacity: 0;
+        }
+        
+        .meta-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        .meta-question {
+            margin-bottom: 20px;
+        }
+        
+        .meta-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            margin-bottom: 6px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        
+        .meta-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            background: var(--white);
+            color: var(--black);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        
+        .meta-select:hover {
+            border-color: var(--gray-400);
+        }
+        
+        .meta-select:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        /* Results */
+        .results-section {
+            display: none;
+            opacity: 0;
+        }
+        
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .profile-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 6px;
+            color: var(--black);
+            letter-spacing: -0.02em;
+        }
+        
+        .profile-tagline {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--gray-600);
+            margin-bottom: 36px;
+        }
+        
+        /* Radar Chart Placeholder */
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin: 36px 0;
+            padding: 24px;
+            border: 1px solid var(--gray-100);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+        }
+        
+        .chart-svg {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+        }
+        
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            font-size: 11px;
+            color: var(--gray-600);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+        
+        .metric {
+            padding: 20px;
+            border: 1px solid var(--gray-100);
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 2px;
+            color: var(--black);
+            letter-spacing: -0.02em;
+        }
+        
+        .metric-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            font-weight: 400;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        
+        .detail-section {
+            margin-bottom: 28px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .detail-section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .detail-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            margin-bottom: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        
+        .detail-item {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--black);
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item::before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: var(--gray-400);
+        }
+
+        /* CTA Box */
+        .cta-box {
+            background: var(--gray-50);
+            padding: 28px;
+            border-radius: 4px;
+            margin: 36px 0;
+            border: 1px solid var(--gray-100);
+        }
+        
+        .cta-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        
+        .cta-description {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .cta-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--gray-400);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        
+        .cta-form {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .cta-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            background: var(--white);
+        }
+        
+        .cta-input:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 32px;
+            text-align: center;
+            border-top: 1px solid var(--gray-100);
+        }
+        
+        .footer-content {
+            font-size: 11px;
+            color: var(--gray-400);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        
+        .footer-content a {
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .footer-content a:hover {
+            color: var(--black);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .container {
+                padding: 80px 24px 48px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-form {
+                flex-direction: column;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-buttons .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">syris<span class="dot">.</span></a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">home</a>
+                <a href="/services" class="nav-link">services</a>
+                <a href="/about" class="nav-link">about</a>
+                <a href="https://calendly.com/syris/30min" target="_blank" class="nav-cta">book call</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText"></div>
+        </div>
+
+        <!-- Intro -->
+        <section class="intro" id="introSection">
+            <h1>calm<span class="dot">.</span>profile</h1>
+            <p class="intro-sub">
+                behavior-based operational assessment.<br>
+                identify your workstyle. reduce friction. ship faster.
+            </p>
+            <div class="intro-meta">20 behavioral choices · 5 minutes · immediate insights</div>
+            <button class="btn" onclick="startAssessment()">begin assessment →</button>
+        </section>
+
+        <!-- Questions Container -->
+        <div id="questionsContainer"></div>
+
+        <!-- Meta Questions -->
+        <section class="meta-section" id="metaSection">
+            <h2>organizational context</h2>
+            
+            <div class="meta-question">
+                <label class="meta-label" for="teamSize">team size</label>
+                <select class="meta-select" id="teamSize" required>
+                    <option value="">select</option>
+                    <option value="solo">solo practitioner</option>
+                    <option value="2-5">2-5 people</option>
+                    <option value="6-15">6-15 people</option>
+                    <option value="16-50">16-50 people</option>
+                    <option value="50+">50+ people</option>
+                </select>
+            </div>
+            
+            <div class="meta-question">
+                <label class="meta-label" for="meetings">weekly meeting load</label>
+                <select class="meta-select" id="meetings" required>
+                    <option value="">select</option>
+                    <option value="0-2">minimal (0-2)</option>
+                    <option value="3-6">light (3-6)</option>
+                    <option value="7-10">moderate (7-10)</option>
+                    <option value="11-15">heavy (11-15)</option>
+                    <option value="16+">extreme (16+)</option>
+                </select>
+            </div>
+            
+            <div class="meta-question">
+                <label class="meta-label" for="platform">primary ecosystem</label>
+                <select class="meta-select" id="platform" required>
+                    <option value="">select</option>
+                    <option value="microsoft">microsoft 365</option>
+                    <option value="google">google workspace</option>
+                    <option value="slack">slack ecosystem</option>
+                    <option value="other">custom stack</option>
+                </select>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="previousFromMeta()">← back</button>
+                <button class="btn" onclick="submitAssessment()" id="submitBtn" disabled>calculate →</button>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section class="results-section" id="resultsSection">
+            <h1>assessment complete<span class="dot">.</span></h1>
+            <div class="profile-type" id="profileType"></div>
+            <p class="profile-tagline" id="profileTagline"></p>
+
+            <!-- Radar Chart -->
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    <svg class="chart-svg" viewBox="0 0 280 280" id="radarChart"></svg>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--black)"></span>
+                            <span>your profile</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--gray-400)"></span>
+                            <span>benchmark</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-value" id="overheadIndex">--</div>
+                    <div class="metric-label">overhead</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="hoursLost">--</div>
+                    <div class="metric-label">hrs/week</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="annualCost">--</div>
+                    <div class="metric-label">cost/year</div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-title">operational strengths</h3>
+                <div id="strengthsList"></div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-title">immediate optimizations</h3>
+                <div id="quickWinsList"></div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-title">technology stack</h3>
+                <div id="toolsList" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gray-600);"></div>
+            </div>
+
+            <div class="cta-box">
+                <div class="cta-title">unlock your complete diagnostic</div>
+                <p class="cta-description">
+                    receive your personalized 12-page operational analysis with friction heatmaps, 
+                    implementation roadmap, and 30-minute strategy consultation.
+                </p>
+                <p class="cta-price">valued at $495</p>
+                <form class="cta-form" action="https://formspree.io/f/mkgvovee" method="POST">
+                    <input type="hidden" name="_subject" value="calm.profile Assessment Results">
+                    <input type="hidden" name="profile_data" id="profileData">
+                    <input type="email" name="email" class="cta-input" placeholder="your@email.com" required>
+                    <button type="submit" class="btn">get your report →</button>
+                </form>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="restartAssessment()" style="font-size: 11px;">retake assessment</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <a href="/">syris<span class="dot">.</span></a> — systematic solutions for modern chaos
+        </div>
+    </footer>
+
+    <script>
+        // Behavior-based questions with binary choices
+        const questions = [
+            {
+                axis: "structure",
+                context: "starting a new project",
+                statement: "when starting a new project, i typically:",
+                optionA: "create a structured plan with clear phases",
+                optionB: "jump in and adapt as needed",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "structure", 
+                context: "weekly planning",
+                statement: "at the start of each week, i:",
+                optionA: "lay out a clear plan for tasks and priorities",
+                optionB: "tackle things as they arise day-by-day",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "structure",
+                context: "team processes",
+                statement: "when defining how the team works, i prefer to:",
+                optionA: "implement clear, step-by-step processes",
+                optionB: "keep things flexible and case-by-case",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "structure",
+                context: "project tracking",
+                statement: "to keep projects on track, i rely on:",
+                optionA: "structured tools and checklists",
+                optionB: "informal check-ins and on-the-fly adjustments",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "structure",
+                context: "course correction",
+                statement: "if a project goes off track, i:",
+                optionA: "stick to the original plan to correct it",
+                optionB: "pivot and adjust the plan as needed",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "collaboration",
+                context: "team input",
+                statement: "if i need input from my team, i usually:",
+                optionA: "call a quick meeting or video chat",
+                optionB: "send a message and wait for a reply",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "collaboration",
+                context: "daily updates",
+                statement: "for daily updates, i prefer:",
+                optionA: "a live team check-in or standup",
+                optionB: "written updates everyone reads on their own",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "collaboration",
+                context: "task instructions",
+                statement: "when giving task instructions, i typically:",
+                optionA: "explain it in person or on a call",
+                optionB: "write it out so they can review when ready",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "collaboration",
+                context: "complex issues",
+                statement: "to address a complex issue, i:",
+                optionA: "schedule a real-time discussion",
+                optionB: "provide detailed thoughts via written comms",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "collaboration",
+                context: "coordination style",
+                statement: "my coordination style is:",
+                optionA: "mostly live conversations with the team",
+                optionB: "mostly written communication",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "scope",
+                context: "project planning",
+                statement: "when planning a project, i focus more on:",
+                optionA: "the big-picture goals and outcomes",
+                optionB: "the specific deliverables and details",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "scope",
+                context: "managing work",
+                statement: "in managing work, i tend to:",
+                optionA: "emphasize overall progress toward goals",
+                optionB: "dive into the details of each task",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "scope",
+                context: "reviewing work",
+                statement: "when reviewing my team's work, i pay more attention to:",
+                optionA: "how it aligns with broader objectives",
+                optionB: "the fine details and correctness",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "scope",
+                context: "leadership approach",
+                statement: "my leadership approach is more about:",
+                optionA: "setting the vision and high-level direction",
+                optionB: "managing the details and day-to-day execution",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "scope",
+                context: "known for",
+                statement: "people know me for:",
+                optionA: "my big-picture vision",
+                optionB: "my attention to detail",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "tempo",
+                context: "deadlines",
+                statement: "as a deadline approaches, i:",
+                optionA: "push to deliver quickly and hit the goal",
+                optionB: "take extra time to ensure everything is perfect",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "tempo",
+                context: "work pace",
+                statement: "my work pace is generally:",
+                optionA: "fast and action-oriented",
+                optionB: "steady and methodical",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "tempo",
+                context: "decision making",
+                statement: "when making decisions, i usually:",
+                optionA: "decide quickly to keep things moving",
+                optionB: "take time to deliberate before acting",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "tempo",
+                context: "under pressure",
+                statement: "under pressure, i tend to:",
+                optionA: "accelerate and move even faster",
+                optionB: "slow down to think things through",
+                scoreA: 1, scoreB: -1
+            },
+            {
+                axis: "tempo",
+                context: "priorities",
+                statement: "overall, i prioritize:",
+                optionA: "rapid results and momentum",
+                optionB: "careful execution, even if it's slower",
+                scoreA: 1, scoreB: -1
+            }
+        ];
+
+        const profiles = {
+            architect: {
+                title: "architect",
+                tagline: "systematic builder of scalable operational frameworks",
+                strengths: [
+                    "exceptional process architecture and system design",
+                    "predictive risk mitigation and contingency planning",
+                    "comprehensive documentation and knowledge management"
+                ],
+                quickWins: [
+                    "implement centralized standard operating procedures",
+                    "establish change control gates with approval workflows",
+                    "institute weekly operational reviews with metrics"
+                ],
+                tools: {
+                    microsoft: ["notion · azure boards · power automate"],
+                    google: ["notion · sheets automation · zapier"],
+                    slack: ["notion · linear · workflow builder"],
+                    other: ["notion · jira · custom middleware"]
+                }
+            },
+            curator: {
+                title: "curator",
+                tagline: "adaptive orchestrator balancing flexibility with coordination",
+                strengths: [
+                    "balanced approach to structure and flexibility",
+                    "strong collaborative instincts with practical execution",
+                    "adaptive methodology that scales with context"
+                ],
+                quickWins: [
+                    "implement flexible frameworks with clear boundaries",
+                    "create collaborative spaces with defined outcomes",
+                    "establish rhythm of structured and unstructured time"
+                ],
+                tools: {
+                    microsoft: ["planner · teams · onenote"],
+                    google: ["trello · meet · keep"],
+                    slack: ["trello · slack canvas · zoom"],
+                    other: ["monday · miro · confluence"]
+                }
+            },
+            conductor: {
+                title: "conductor",
+                tagline: "real-time orchestrator of team dynamics and collaboration",
+                strengths: [
+                    "multi-stakeholder alignment and consensus building",
+                    "real-time facilitation and conflict resolution",
+                    "cross-functional coordination and resource optimization"
+                ],
+                quickWins: [
+                    "implement 25-minute timeboxed synchronous standups",
+                    "establish meeting-free focus blocks (wednesdays)",
+                    "transition status updates to async video briefings"
+                ],
+                tools: {
+                    microsoft: ["teams · planner · loop workspaces"],
+                    google: ["meet · asana · collaborative docs"],
+                    slack: ["huddles · asana · loom async"],
+                    other: ["zoom · monday · mural boards"]
+                }
+            },
+            craftsperson: {
+                title: "craftsperson",
+                tagline: "precision specialist focused on execution excellence",
+                strengths: [
+                    "uncompromising attention to quality and detail",
+                    "deep technical expertise and domain mastery",
+                    "consistent delivery of exceptional outputs"
+                ],
+                quickWins: [
+                    "block daily 90-minute deep work sessions",
+                    "define explicit 'done' criteria for all deliverables",
+                    "implement work-in-progress limits (max 3)"
+                ],
+                tools: {
+                    microsoft: ["linear · onedrive · focus assist"],
+                    google: ["linear · drive · calendar blocking"],
+                    slack: ["linear · github · do not disturb"],
+                    other: ["linear · git · productivity apps"]
+                }
+            }
+        };
+
+        // State
+        let currentQuestion = 0;
+        let answers = {};
+
+        function startAssessment() {
+            document.getElementById('introSection').style.display = 'none';
+            currentQuestion = 0;
+            answers = {};
+            generateQuestions();
+            showQuestion(currentQuestion);
+            updateProgress();
+        }
+
+        function generateQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const questionHTML = `
+                    <section class="question-section" id="question${index}">
+                        <div class="question-context">${q.context}</div>
+                        <div class="question-statement">${q.statement}</div>
+                        
+                        <div class="choice-container">
+                            <button class="choice-option" 
+                                onclick="selectAnswer(${index}, 'A')">
+                                ${q.optionA}
+                                <span class="choice-letter">A</span>
+                            </button>
+                            <button class="choice-option" 
+                                onclick="selectAnswer(${index}, 'B')">
+                                ${q.optionB}
+                                <span class="choice-letter">B</span>
+                            </button>
+                        </div>
+                        
+                        <div class="nav-buttons">
+                            <button class="btn btn-secondary" onclick="previousQuestion()" 
+                                ${index === 0 ? 'disabled' : ''}>← previous</button>
+                            <button class="btn" onclick="nextQuestion()" 
+                                id="nextBtn${index}" disabled>continue →</button>
+                        </div>
+                    </section>
+                `;
+                container.insertAdjacentHTML('beforeend', questionHTML);
+            });
+        }
+
+        function showQuestion(num) {
+            document.querySelectorAll('.question-section').forEach(s => s.classList.remove('active'));
+            const q = document.getElementById(`question${num}`);
+            if (q) {
+                setTimeout(() => q.classList.add('active'), 10);
+            }
+        }
+
+        function selectAnswer(qIndex, choice) {
+            const q = questions[qIndex];
+            answers[qIndex] = {
+                axis: q.axis,
+                score: choice === 'A' ? q.scoreA : q.scoreB
+            };
+            
+            const buttons = document.querySelectorAll(`#question${qIndex} .choice-option`);
+            buttons.forEach((btn, i) => {
+                btn.classList.toggle('selected', (choice === 'A' && i === 0) || (choice === 'B' && i === 1));
+            });
+            
+            document.getElementById(`nextBtn${qIndex}`).disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showMetaQuestions();
+            }
+            updateProgress();
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+                updateProgress();
+            }
+        }
+
+        function showMetaQuestions() {
+            document.querySelectorAll('.question-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('metaSection').classList.add('active');
+            updateProgress();
+            
+            const checkMeta = () => {
+                const complete = document.getElementById('teamSize').value && 
+                               document.getElementById('meetings').value && 
+                               document.getElementById('platform').value;
+                document.getElementById('submitBtn').disabled = !complete;
+            };
+            
+            ['teamSize', 'meetings', 'platform'].forEach(id => {
+                document.getElementById(id).addEventListener('change', checkMeta);
+            });
+        }
+
+        function previousFromMeta() {
+            document.getElementById('metaSection').classList.remove('active');
+            currentQuestion = questions.length - 1;
+            showQuestion(currentQuestion);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / (questions.length + 1)) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            if (currentQuestion < questions.length) {
+                document.getElementById('progressText').textContent = 
+                    `question ${currentQuestion + 1} of ${questions.length}`;
+            } else {
+                document.getElementById('progressText').textContent = 'finalizing';
+            }
+        }
+
+        function submitAssessment() {
+            const scores = calculateScores();
+            const archetype = determineArchetype(scores);
+            displayResults(archetype, scores);
+        }
+
+        function calculateScores() {
+            // Calculate axis scores from binary choices
+            const axisScores = {
+                structure: 0,
+                collaboration: 0,
+                scope: 0,
+                tempo: 0
+            };
+            
+            Object.values(answers).forEach(answer => {
+                if (answer && answer.axis) {
+                    axisScores[answer.axis] += answer.score;
+                }
+            });
+            
+            // Normalize to 0-100 scale
+            Object.keys(axisScores).forEach(axis => {
+                // Each axis has 5 questions, range is -5 to +5
+                axisScores[axis] = ((axisScores[axis] + 5) / 10) * 100;
+            });
+            
+            // Simple overhead calculation based on extremes
+            const variance = Object.values(axisScores).reduce((acc, score) => {
+                return acc + Math.abs(score - 50);
+            }, 0) / 4;
+            
+            const overheadIndex = Math.round(50 + variance * 0.8);
+            const hoursLost = Math.round(6.0 * (overheadIndex / 100) * 10) / 10;
+            const teamSize = {solo: 1, '2-5': 4, '6-15': 10, '16-50': 30, '50+': 60};
+            const teamHours = Math.round(hoursLost * (teamSize[document.getElementById('teamSize').value] || 4));
+            const annualCost = Math.round(teamHours * 52 * 125 / 1000);
+            
+            return { axisScores, overheadIndex, hoursLost, teamHours, annualCost };
+        }
+
+        function determineArchetype(scores) {
+            const { axisScores } = scores;
+            
+            // Simplified archetype determination based on dominant traits
+            if (axisScores.structure > 60 && axisScores.collaboration < 40) {
+                return 'architect';
+            } else if (axisScores.collaboration > 60 && axisScores.tempo > 60) {
+                return 'conductor';
+            } else if (axisScores.scope < 40 && axisScores.tempo < 40) {
+                return 'craftsperson';
+            } else {
+                return 'curator'; // Balanced profile
+            }
+        }
+
+        function drawRadarChart(scores) {
+            const svg = document.getElementById('radarChart');
+            const centerX = 140;
+            const centerY = 140;
+            const radius = 100;
+            
+            // Clear existing content
+            svg.innerHTML = '';
+            
+            // Draw grid circles
+            for (let i = 1; i <= 4; i++) {
+                const r = (radius * i) / 4;
+                const circle = `<circle cx="${centerX}" cy="${centerY}" r="${r}" 
+                    fill="none" stroke="#E5E5E5" stroke-width="1"/>`;
+                svg.innerHTML += circle;
+            }
+            
+            // Labels and axes
+            const axes = [
+                { label: 'structure', angle: -90 },
+                { label: 'collaboration', angle: 0 },
+                { label: 'scope', angle: 90 },
+                { label: 'tempo', angle: 180 }
+            ];
+            
+            axes.forEach(axis => {
+                const angleRad = (axis.angle * Math.PI) / 180;
+                const x = centerX + radius * Math.cos(angleRad);
+                const y = centerY + radius * Math.sin(angleRad);
+                
+                // Draw axis line
+                const line = `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" 
+                    stroke="#E5E5E5" stroke-width="1"/>`;
+                svg.innerHTML += line;
+                
+                // Add label
+                const labelX = centerX + (radius + 20) * Math.cos(angleRad);
+                const labelY = centerY + (radius + 20) * Math.sin(angleRad);
+                const label = `<text x="${labelX}" y="${labelY}" 
+                    font-family="JetBrains Mono" font-size="10" fill="#666" 
+                    text-anchor="middle" dominant-baseline="middle">${axis.label}</text>`;
+                svg.innerHTML += label;
+            });
+            
+            // Draw data polygon
+            const dataPoints = axes.map(axis => {
+                const value = scores.axisScores[axis.label.split(' ')[0]] || 50;
+                const angleRad = (axis.angle * Math.PI) / 180;
+                const r = (radius * value) / 100;
+                return {
+                    x: centerX + r * Math.cos(angleRad),
+                    y: centerY + r * Math.sin(angleRad)
+                };
+            });
+            
+            const polygonPoints = dataPoints.map(p => `${p.x},${p.y}`).join(' ');
+            const polygon = `<polygon points="${polygonPoints}" 
+                fill="rgba(0,0,0,0.1)" stroke="#000" stroke-width="2"/>`;
+            svg.innerHTML += polygon;
+            
+            // Draw benchmark polygon (industry average)
+            const benchmarkPoints = axes.map(axis => {
+                const angleRad = (axis.angle * Math.PI) / 180;
+                const r = (radius * 50) / 100; // 50% for all axes as benchmark
+                return {
+                    x: centerX + r * Math.cos(angleRad),
+                    y: centerY + r * Math.sin(angleRad)
+                };
+            });
+            
+            const benchmarkPolygonPoints = benchmarkPoints.map(p => `${p.x},${p.y}`).join(' ');
+            const benchmarkPolygon = `<polygon points="${benchmarkPolygonPoints}" 
+                fill="none" stroke="#999" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>`;
+            svg.innerHTML += benchmarkPolygon;
+        }
+
+        function displayResults(archetype, scores) {
+            const profile = profiles[archetype];
+            const platform = document.getElementById('platform').value;
+            
+            document.getElementById('metaSection').classList.remove('active');
+            
+            document.getElementById('profileType').textContent = profile.title;
+            document.getElementById('profileTagline').textContent = profile.tagline;
+            document.getElementById('overheadIndex').textContent = `${scores.overheadIndex}%`;
+            document.getElementById('hoursLost').textContent = `${scores.hoursLost}`;
+            document.getElementById('annualCost').textContent = `$${scores.annualCost}k`;
+            
+            document.getElementById('strengthsList').innerHTML = 
+                profile.strengths.map(s => `<div class="detail-item">${s}</div>`).join('');
+            
+            document.getElementById('quickWinsList').innerHTML = 
+                profile.quickWins.map(q => `<div class="detail-item">${q}</div>`).join('');
+            
+            document.getElementById('toolsList').textContent = profile.tools[platform][0];
+            
+            // Draw radar chart
+            drawRadarChart(scores);
+            
+            document.getElementById('profileData').value = JSON.stringify({
+                archetype, 
+                scores, 
+                platform, 
+                timestamp: new Date().toISOString()
+            });
+            
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = 'complete';
+        }
+
+        function restartAssessment() {
+            currentQuestion = 0;
+            answers = {};
+            
+            document.querySelectorAll('.choice-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('[id^="nextBtn"]').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            ['teamSize', 'meetings', 'platform'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('submitBtn').disabled = true;
+            
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('metaSection').classList.remove('active');
+            document.getElementById('introSection').style.display = 'block';
+            
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '';
+        }
+    </script>
+</body>
+</html>

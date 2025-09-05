@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: calm-profile-api
+    env: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: REPORTS_FROM_EMAIL
+        sync: false
+      - key: CHECKOUT_SUCCESS_URL
+        value: https://syris.systems/calm-profile/thank-you?session_id={CHECKOUT_SESSION_ID}
+      - key: CHECKOUT_CANCEL_URL
+        value: https://syris.systems/calm-profile
+
