@@ -6,6 +6,10 @@ from typing import Optional
 from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 import stripe
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from sqlalchemy import (
     create_engine,
@@ -27,12 +31,14 @@ except Exception:  # still allow api to boot if module missing
 
 # ---------- config ----------
 
+
 def _normalize_db_url(url: str) -> str:
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
     if url.startswith("postgresql://"):
         return url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
+
 
 DATABASE_URL = _normalize_db_url(os.environ.get("DATABASE_URL", ""))
 if not DATABASE_URL:
@@ -51,8 +57,10 @@ stripe.api_key = STRIPE_SECRET_KEY
 
 # ---------- db setup ----------
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class Assessment(Base):
     __tablename__ = "assessments"
@@ -63,23 +71,38 @@ class Assessment(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
+
 class Payment(Base):
     __tablename__ = "payments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    assessment_id: Mapped[Optional[int]] = mapped_column(ForeignKey("assessments.id"), nullable=True)
-    stripe_session_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
-    stripe_payment_intent: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
-    stripe_event_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
+    assessment_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("assessments.id"), nullable=True
+    )
+    stripe_session_id: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True
+    )
+    stripe_payment_intent: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
+    stripe_event_id: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True
+    )
     status: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     currency: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     amount_total: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # cents
-    customer_email: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
+    customer_email: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
+
 
 engine = create_engine(
     DATABASE_URL,
@@ -95,22 +118,25 @@ app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 # FIXED CORS CONFIGURATION
-CORS(app, 
-     origins=[
-         "https://calmprofile.vercel.app",
-         "https://*.vercel.app",
-         "http://localhost:5173",
-         "http://localhost:3000",
-         "http://localhost:5000"
-     ],
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "OPTIONS"],
-     supports_credentials=True
+CORS(
+    app,
+    origins=[
+        "https://calmprofile.vercel.app",
+        "https://*.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:5000",
+    ],
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"],
+    supports_credentials=True,
 )
+
 
 @app.before_request
 def _open_session():
     g.db = SessionLocal()
+
 
 @app.teardown_request
 def _close_session(exc=None):
@@ -122,6 +148,7 @@ def _close_session(exc=None):
         finally:
             db.close()
 
+
 def _frontend_base() -> str:
     origin = request.headers.get("Origin")
     if origin and origin.startswith("http"):
@@ -130,18 +157,23 @@ def _frontend_base() -> str:
         return FRONTEND_URL
     return "https://calmprofile.vercel.app"
 
+
 def _json(data, status=200):
     return jsonify(data), status
 
+
 # ---------- health ----------
+
 
 @app.get("/")
 def root():
     return _json({"service": "calm-profile-api", "status": "ok"})
 
+
 @app.get("/health")
 def health():
     return _json({"ok": True, "time": datetime.utcnow().isoformat() + "Z"})
+
 
 @app.get("/db-check")
 def db_check():
@@ -152,17 +184,23 @@ def db_check():
     except Exception as e:
         return _json({"db": "error", "detail": str(e)}, status=500)
 
+
 # ---------- assessment scoring (for "calculate roi") ----------
+
 
 @app.post("/api/assess")
 def assess():
     if not score_assessment:
-        return _json({"success": False, "error": "scoring module not available"}, status=500)
+        return _json(
+            {"success": False, "error": "scoring module not available"}, status=500
+        )
 
     try:
         payload = request.get_json(silent=True) or {}
         responses = payload.get("responses", {})
-        context = payload.get("context", {})  # team_size, meeting_load, hourly_rate, platform
+        context = payload.get(
+            "context", {}
+        )  # team_size, meeting_load, hourly_rate, platform
         email = payload.get("email")
 
         # normalize responses: convert string indices to int indices for questions 0-19
@@ -170,7 +208,9 @@ def assess():
         for i in range(20):
             response_value = responses.get(str(i), "")
             # Convert A/B to 1/0
-            normalized_responses[str(i)] = 1 if str(response_value).upper() == "A" else 0
+            normalized_responses[str(i)] = (
+                1 if str(response_value).upper() == "A" else 0
+            )
 
         # run scorer
         result = score_assessment(normalized_responses)
@@ -180,7 +220,12 @@ def assess():
         meeting_load = str(context.get("meeting_load", "moderate")).lower()
         overhead_base = meeting_map.get(meeting_load, 0.8)
 
-        arche_adj = {"architect": 0.9, "conductor": 0.85, "curator": 1.1, "craftsperson": 1.2}
+        arche_adj = {
+            "architect": 0.9,
+            "conductor": 0.85,
+            "curator": 1.1,
+            "craftsperson": 1.2,
+        }
         primary = str(result.get("archetype", {}).get("primary", "architect")).lower()
         overhead_index = overhead_base * arche_adj.get(primary, 1.0)
 
@@ -194,42 +239,50 @@ def assess():
 
         # persist
         row = Assessment(
-            email=email, 
-            data=json.dumps({
-                "responses": normalized_responses, 
-                "context": context,
-                "result": result,
-                "metrics": {
-                    "hours_lost_ppw": hours_lost_ppw, 
-                    "annual_cost": annual_cost, 
-                    "overhead_index": overhead_index
+            email=email,
+            data=json.dumps(
+                {
+                    "responses": normalized_responses,
+                    "context": context,
+                    "result": result,
+                    "metrics": {
+                        "hours_lost_ppw": hours_lost_ppw,
+                        "annual_cost": annual_cost,
+                        "overhead_index": overhead_index,
+                    },
                 }
-            })
+            ),
         )
         g.db.add(row)
         g.db.commit()
 
-        return _json({
-            "success": True,
-            "assessment_id": row.id,
-            "archetype": result.get("archetype", {}),
-            "scores": {
-                "axes": result.get("scores", {}).get("axes", {}), 
-                "overhead_index": round(overhead_index * 100)
-            },
-            "metrics": {
-                "hours_lost_ppw": round(hours_lost_ppw, 1), 
-                "annual_cost": round(annual_cost)
-            },
-            "recommendations": result.get("recommendations", {}),
-            "tagline": result.get("archetype", {}).get("tagline", "")
-        })
+        return _json(
+            {
+                "success": True,
+                "assessment_id": row.id,
+                "archetype": result.get("archetype", {}),
+                "scores": {
+                    "axes": result.get("scores", {}).get("axes", {}),
+                    "overhead_index": round(overhead_index * 100),
+                },
+                "metrics": {
+                    "hours_lost_ppw": round(hours_lost_ppw, 1),
+                    "annual_cost": round(annual_cost),
+                },
+                "recommendations": result.get("recommendations", {}),
+                "tagline": result.get("archetype", {}).get("tagline", ""),
+            }
+        )
     except Exception as e:
         g.db.rollback()
         app.logger.error(f"Assessment error: {str(e)}")
-        return _json({"success": False, "error": "Assessment processing failed"}, status=500)
+        return _json(
+            {"success": False, "error": "Assessment processing failed"}, status=500
+        )
+
 
 # ---------- stripe checkout & webhooks ----------
+
 
 # FIXED: Added /api/create-checkout endpoint that frontend expects
 @app.post("/api/create-checkout")
@@ -261,12 +314,18 @@ def api_create_checkout():
         )
 
         pay = Payment(
-            assessment_id=int(assessment_id) if isinstance(assessment_id, (int, str)) and str(assessment_id).isdigit() else None,
+            assessment_id=(
+                int(assessment_id)
+                if isinstance(assessment_id, (int, str))
+                and str(assessment_id).isdigit()
+                else None
+            ),
             stripe_session_id=session.id,
             status=session.get("payment_status"),
             currency=session.get("currency"),
             amount_total=session.get("amount_total"),
-            customer_email=(session.get("customer_details") or {}).get("email") or email,
+            customer_email=(session.get("customer_details") or {}).get("email")
+            or email,
         )
         g.db.add(pay)
         g.db.commit()
@@ -278,10 +337,12 @@ def api_create_checkout():
         app.logger.error(f"Checkout error: {str(e)}")
         return _json({"error": "Failed to create checkout session"}, status=400)
 
+
 @app.post("/create-checkout-session")
 def create_checkout_session():
     # Keep old endpoint for backwards compatibility
     return api_create_checkout()
+
 
 @app.post("/webhooks/stripe")
 def stripe_webhook():
@@ -292,14 +353,18 @@ def stripe_webhook():
         return _json({"error": "webhook secret not configured"}, status=500)
 
     try:
-        event = stripe.Webhook.construct_event(payload=payload, sig_header=sig_header, secret=STRIPE_WEBHOOK_SECRET)
+        event = stripe.Webhook.construct_event(
+            payload=payload, sig_header=sig_header, secret=STRIPE_WEBHOOK_SECRET
+        )
     except Exception as e:
         return _json({"error": f"invalid signature: {e}"}, status=400)
 
     event_type = event["type"]
     event_id = event["id"]
 
-    existing_event = g.db.execute(select(Payment).where(Payment.stripe_event_id == event_id)).scalar_one_or_none()
+    existing_event = g.db.execute(
+        select(Payment).where(Payment.stripe_event_id == event_id)
+    ).scalar_one_or_none()
     if existing_event:
         return _json({"received": True, "idempotent": True})
 
@@ -314,7 +379,9 @@ def stripe_webhook():
             customer_email = (session_obj.get("customer_details") or {}).get("email")
             assessment_id = session_obj.get("metadata", {}).get("assessment_id")
 
-            row = g.db.execute(select(Payment).where(Payment.stripe_session_id == session_id)).scalar_one_or_none()
+            row = g.db.execute(
+                select(Payment).where(Payment.stripe_session_id == session_id)
+            ).scalar_one_or_none()
             if row:
                 row.stripe_payment_intent = payment_intent
                 row.amount_total = amount_total
@@ -322,31 +389,49 @@ def stripe_webhook():
                 row.status = status
                 row.customer_email = row.customer_email or customer_email
                 row.stripe_event_id = event_id
-                if assessment_id and not row.assessment_id and str(assessment_id).isdigit():
+                if (
+                    assessment_id
+                    and not row.assessment_id
+                    and str(assessment_id).isdigit()
+                ):
                     row.assessment_id = int(assessment_id)
                 g.db.commit()
             else:
-                g.db.add(Payment(
-                    assessment_id=int(assessment_id) if assessment_id and str(assessment_id).isdigit() else None,
-                    stripe_session_id=session_id,
-                    stripe_payment_intent=payment_intent,
-                    amount_total=amount_total,
-                    currency=currency,
-                    status=status,
-                    customer_email=customer_email,
-                    stripe_event_id=event_id,
-                ))
+                g.db.add(
+                    Payment(
+                        assessment_id=(
+                            int(assessment_id)
+                            if assessment_id and str(assessment_id).isdigit()
+                            else None
+                        ),
+                        stripe_session_id=session_id,
+                        stripe_payment_intent=payment_intent,
+                        amount_total=amount_total,
+                        currency=currency,
+                        status=status,
+                        customer_email=customer_email,
+                        stripe_event_id=event_id,
+                    )
+                )
                 g.db.commit()
 
-        elif event_type in ("payment_intent.succeeded", "payment_intent.payment_failed"):
+        elif event_type in (
+            "payment_intent.succeeded",
+            "payment_intent.payment_failed",
+        ):
             intent = event["data"]["object"]
             pi = intent.get("id")
             status = intent.get("status")
             amount = intent.get("amount")
             currency = intent.get("currency")
-            email = (intent.get("charges", {}).get("data", [{}])[0].get("billing_details") or {}).get("email")
+            email = (
+                intent.get("charges", {}).get("data", [{}])[0].get("billing_details")
+                or {}
+            ).get("email")
 
-            row = g.db.execute(select(Payment).where(Payment.stripe_payment_intent == pi)).scalar_one_or_none()
+            row = g.db.execute(
+                select(Payment).where(Payment.stripe_payment_intent == pi)
+            ).scalar_one_or_none()
             if row:
                 row.status = status or row.status
                 row.amount_total = amount or row.amount_total
@@ -355,14 +440,16 @@ def stripe_webhook():
                 row.stripe_event_id = event_id
                 g.db.commit()
             else:
-                g.db.add(Payment(
-                    stripe_payment_intent=pi,
-                    amount_total=amount,
-                    currency=currency,
-                    status=status,
-                    customer_email=email,
-                    stripe_event_id=event_id,
-                ))
+                g.db.add(
+                    Payment(
+                        stripe_payment_intent=pi,
+                        amount_total=amount,
+                        currency=currency,
+                        status=status,
+                        customer_email=email,
+                        stripe_event_id=event_id,
+                    )
+                )
                 g.db.commit()
 
         return _json({"received": True})
@@ -370,14 +457,17 @@ def stripe_webhook():
         g.db.rollback()
         return _json({"error": str(e)}, status=500)
 
+
 # aliases for old paths
 @app.get("/api/health")
 def api_health_alias():
     return health()
 
+
 @app.post("/api/create-checkout-session")
 def api_checkout_session_alias():
     return api_create_checkout()
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")), debug=False)
