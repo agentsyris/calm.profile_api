@@ -44,7 +44,7 @@ if not STRIPE_SECRET_KEY:
 
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 PRICE_ID = os.environ.get("PRICE_ID", "")
-FRONTEND_URL = os.environ.get("FRONTEND_URL")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://calmprofile.vercel.app")
 SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24).hex())
 
 stripe.api_key = STRIPE_SECRET_KEY
@@ -94,8 +94,19 @@ Base.metadata.create_all(engine)
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-cors_origins = [FRONTEND_URL] if FRONTEND_URL else "*"
-CORS(app, resources={r"/api/*": {"origins": cors_origins}, r"/*": {"origins": cors_origins}})
+# FIXED CORS CONFIGURATION
+CORS(app, 
+     origins=[
+         "https://calmprofile.vercel.app",
+         "https://*.vercel.app",
+         "http://localhost:5173",
+         "http://localhost:3000",
+         "http://localhost:5000"
+     ],
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "OPTIONS"],
+     supports_credentials=True
+)
 
 @app.before_request
 def _open_session():
@@ -126,7 +137,7 @@ def _json(data, status=200):
 
 @app.get("/")
 def root():
-    return _json({"service": "calm.profile_api", "status": "ok"})
+    return _json({"service": "calm-profile-api", "status": "ok"})
 
 @app.get("/health")
 def health():
@@ -148,68 +159,93 @@ def assess():
     if not score_assessment:
         return _json({"success": False, "error": "scoring module not available"}, status=500)
 
-    payload = request.get_json(silent=True) or {}
-    responses = payload.get("responses", {})
-    context = payload.get("context", {})  # teamSize, meetingLoad, hourlyRate, platform
-    email = payload.get("email")
+    try:
+        payload = request.get_json(silent=True) or {}
+        responses = payload.get("responses", {})
+        context = payload.get("context", {})  # team_size, meeting_load, hourly_rate, platform
+        email = payload.get("email")
 
-    # normalize a/b -> 1/0 for 20 items
-    answers = {str(i): (1 if str(responses.get(str(i), "")).upper() == "A" else 0) for i in range(1, 21)}
+        # normalize responses: convert string indices to int indices for questions 0-19
+        normalized_responses = {}
+        for i in range(20):
+            response_value = responses.get(str(i), "")
+            # Convert A/B to 1/0
+            normalized_responses[str(i)] = 1 if str(response_value).upper() == "A" else 0
 
-    # run scorer
-    result = score_assessment(answers)
+        # run scorer
+        result = score_assessment(normalized_responses)
 
-    # overhead/roi calc (same logic you used before)
-    meeting_map = {"light": 0.6, "moderate": 0.8, "heavy": 1.0}
-    mkey = next((k for k in meeting_map if k in str(context.get("meetingLoad", "")).lower()), "moderate")
-    overhead_base = meeting_map[mkey]
+        # overhead/roi calc
+        meeting_map = {"light": 0.6, "moderate": 0.8, "heavy": 1.0}
+        meeting_load = str(context.get("meeting_load", "moderate")).lower()
+        overhead_base = meeting_map.get(meeting_load, 0.8)
 
-    arche_adj = {"architect": 0.9, "conductor": 0.85, "curator": 1.1, "craftsperson": 1.2}
-    primary = (result.get("archetype", {}).get("primary") or "").lower()
-    overhead_index = overhead_base * arche_adj.get(primary, 1.0)
+        arche_adj = {"architect": 0.9, "conductor": 0.85, "curator": 1.1, "craftsperson": 1.2}
+        primary = str(result.get("archetype", {}).get("primary", "architect")).lower()
+        overhead_index = overhead_base * arche_adj.get(primary, 1.0)
 
-    team_mult = {"solo": 1, "2-5": 4, "6-15": 10, "16-50": 25, "50+": 55}
-    tm = next((v for k, v in team_mult.items() if k in str(context.get("teamSize", "solo"))), 1)
+        team_mult = {"solo": 1, "2-5": 4, "6-15": 10, "16-50": 25, "50+": 55}
+        team_size = str(context.get("team_size", "solo"))
+        tm = team_mult.get(team_size, 1)
 
-    hourly_rate = float(context.get("hourlyRate", 85))
-    hours_lost_ppw = overhead_index * 5.0
-    annual_cost = hours_lost_ppw * 52 * hourly_rate * tm
+        hourly_rate = float(context.get("hourly_rate", 85))
+        hours_lost_ppw = overhead_index * 5.0
+        annual_cost = hours_lost_ppw * 52 * hourly_rate * tm
 
-    # persist
-    row = Assessment(email=email, data=json.dumps({
-        "responses": answers, "context": context,
-        "result": result,
-        "metrics": {"hours_lost_ppw": hours_lost_ppw, "annual_cost": annual_cost, "overhead_index": overhead_index}
-    }))
-    g.db.add(row)
-    g.db.commit()
+        # persist
+        row = Assessment(
+            email=email, 
+            data=json.dumps({
+                "responses": normalized_responses, 
+                "context": context,
+                "result": result,
+                "metrics": {
+                    "hours_lost_ppw": hours_lost_ppw, 
+                    "annual_cost": annual_cost, 
+                    "overhead_index": overhead_index
+                }
+            })
+        )
+        g.db.add(row)
+        g.db.commit()
 
-    return _json({
-        "success": True,
-        "assessment_id": row.id,
-        "archetype": result.get("archetype", {}),
-        "scores": {**result.get("scores", {}).get("axes", {}), "overhead_index": round(overhead_index * 100)},
-        "metrics": {"hours_lost_ppw": round(hours_lost_ppw, 1), "annual_cost": round(annual_cost)},
-        "recommendations": result.get("recommendations", []),
-        "tagline": (result.get("archetype") or {}).get("tagline", "")
-    })
+        return _json({
+            "success": True,
+            "assessment_id": row.id,
+            "archetype": result.get("archetype", {}),
+            "scores": {
+                "axes": result.get("scores", {}).get("axes", {}), 
+                "overhead_index": round(overhead_index * 100)
+            },
+            "metrics": {
+                "hours_lost_ppw": round(hours_lost_ppw, 1), 
+                "annual_cost": round(annual_cost)
+            },
+            "recommendations": result.get("recommendations", {}),
+            "tagline": result.get("archetype", {}).get("tagline", "")
+        })
+    except Exception as e:
+        g.db.rollback()
+        app.logger.error(f"Assessment error: {str(e)}")
+        return _json({"success": False, "error": "Assessment processing failed"}, status=500)
 
 # ---------- stripe checkout & webhooks ----------
 
-@app.post("/create-checkout-session")
-def create_checkout_session():
+# FIXED: Added /api/create-checkout endpoint that frontend expects
+@app.post("/api/create-checkout")
+def api_create_checkout():
     if not PRICE_ID:
         return _json({"error": "PRICE_ID not configured"}, status=500)
 
-    payload = request.get_json(silent=True) or {}
-    assessment_id = payload.get("assessment_id")
-    email = payload.get("email")
-
-    success_base = _frontend_base()
-    success_url = f"{success_base}/thank-you?session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = f"{success_base}/"
-
     try:
+        payload = request.get_json(silent=True) or {}
+        assessment_id = payload.get("assessment_id")
+        email = payload.get("email")
+
+        success_base = _frontend_base()
+        success_url = f"{success_base}/thank-you?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{success_base}/"
+
         metadata = {}
         if assessment_id is not None:
             metadata["assessment_id"] = str(assessment_id)
@@ -235,10 +271,17 @@ def create_checkout_session():
         g.db.add(pay)
         g.db.commit()
 
-        return _json({"url": session.url})
+        # Return the expected field name
+        return _json({"checkout_url": session.url})
     except Exception as e:
         g.db.rollback()
-        return _json({"error": str(e)}, status=400)
+        app.logger.error(f"Checkout error: {str(e)}")
+        return _json({"error": "Failed to create checkout session"}, status=400)
+
+@app.post("/create-checkout-session")
+def create_checkout_session():
+    # Keep old endpoint for backwards compatibility
+    return api_create_checkout()
 
 @app.post("/webhooks/stripe")
 def stripe_webhook():
@@ -333,8 +376,8 @@ def api_health_alias():
     return health()
 
 @app.post("/api/create-checkout-session")
-def api_checkout_alias():
-    return create_checkout_session()
+def api_checkout_session_alias():
+    return api_create_checkout()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")), debug=False)
