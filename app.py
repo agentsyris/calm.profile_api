@@ -211,27 +211,27 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         # Debug: check what's actually available
         app.logger.info(f"Current working directory: {os.getcwd()}")
         app.logger.info(f"Directory contents: {os.listdir('.')}")
-        
+
         # Try different possible paths
         possible_paths = [
             "/opt/render/project/src/renderer/render_report.py",
-            "/opt/render/project/renderer/render_report.py", 
+            "/opt/render/project/renderer/render_report.py",
             "/opt/render/renderer/render_report.py",
             "renderer/render_report.py",
             "./renderer/render_report.py",
-            os.path.join(os.getcwd(), "renderer", "render_report.py")
+            os.path.join(os.getcwd(), "renderer", "render_report.py"),
         ]
-        
+
         renderer_script = None
         for path in possible_paths:
             app.logger.info(f"Checking: {path} - exists: {os.path.exists(path)}")
             if os.path.exists(path):
                 renderer_script = path
                 break
-        
+
         if not renderer_script:
             raise Exception(f"Could not find renderer script. Tried: {possible_paths}")
-        
+
         app.logger.info(f"Using renderer script: {renderer_script}")
 
         renderer_cmd = [
@@ -434,6 +434,10 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
     response = requests.post(
         "https://api.postmarkapp.com/email", headers=headers, json=data
     )
+    
+    if response.status_code != 200:
+        app.logger.error(f"Postmark API error: {response.status_code} - {response.text}")
+    
     return response.status_code == 200
 
 
