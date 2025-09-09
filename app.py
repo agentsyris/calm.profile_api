@@ -444,7 +444,8 @@ def send_resend_email(customer_email: str, pdf_url: str, company_name: str) -> b
 
 @app.get("/")
 def root():
-    return _json({"service": "calm-profile-api", "status": "ok"})
+    app.logger.info("Root endpoint accessed")
+    return _json({"service": "calm-profile-api", "status": "ok", "version": "1.1"})
 
 
 @app.get("/health")
