@@ -198,6 +198,7 @@ def _json(data, status=200):
 def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
     """validate required fields and normalize data for template rendering"""
     from renderer.schema import to_report_fields, validate_template_fields
+    from renderer.render_report import fmt_confidence
 
     # required fields that must exist
     required_fields = [
@@ -318,7 +319,7 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
             ],
         ),
         # radar insights
-        "radar_insights": f"archetype analysis shows {result.get('archetype', {}).get('primary', 'unknown')} tendencies with {result.get('archetype', {}).get('confidence', 0)}% confidence",
+        "radar_insights": f"archetype analysis shows {result.get('archetype', {}).get('primary', 'unknown')} tendencies with {fmt_confidence(result.get('archetype', {}).get('confidence', 0))} confidence",
         # time breakdown
         "time_productive": 45,
         "time_meetings": 25,

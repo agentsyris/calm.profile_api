@@ -4,7 +4,7 @@
 
 **{{ company_name | default('—') }}** · **{{ assessment_date | default('—') }}** · **{{ report_id | default('—') }}**
 
-{{ archetype_primary | default('—') }} archetype detected with {{ fmt_percent(archetype_confidence | default(0)) }} confidence.
+{{ archetype_primary | default('—') }} archetype detected with {{ fmt_confidence(archetype_confidence) }} confidence.
 
 **headline roi:**
 

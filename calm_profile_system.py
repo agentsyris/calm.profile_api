@@ -142,9 +142,17 @@ def score_assessment(responses: Dict[str, int]) -> Dict[str, Any]:
     axis_scores = calculate_axis_scores(responses)
     matches = calculate_archetype_match(axis_scores)
     primary = max(matches, key=lambda k: matches[k])
+    
+    # Calculate confidence as the difference between top two matches
+    sorted_matches = sorted(matches.items(), key=lambda x: x[1], reverse=True)
+    primary_score = sorted_matches[0][1]
+    secondary_score = sorted_matches[1][1] if len(sorted_matches) > 1 else 0
+    confidence = max(0, min(100, primary_score - secondary_score + 50))  # Base confidence + gap
+    
     return {
         "archetype": {
             "primary": primary,
+            "confidence": round(confidence, 1),
             "mix": determine_archetype_mix(matches),
             "tagline": ARCHETYPES[primary].get("tagline", "")
         },

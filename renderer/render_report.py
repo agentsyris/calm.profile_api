@@ -45,11 +45,11 @@ def fmt_hours(x):
     return f"{float(x):.1f}"
 
 
-def fmt_round(x, digits=0):
-    """format number with specified decimal places"""
-    if x is None:
-        return "0"
-    return f"{float(x):.{digits}f}"
+def fmt_confidence(x):
+    """format confidence percentage or show unavailable message"""
+    if x is None or x == 0 or x == 0.0:
+        return "confidence unavailable"
+    return f"{float(x):.1f}%"
 
 
 try:
@@ -119,6 +119,7 @@ class ReportRenderer:
                 "fmt_percent": fmt_percent,
                 "fmt_hours": fmt_hours,
                 "fmt_round": fmt_round,
+                "fmt_confidence": fmt_confidence,
             }
 
             return template.render(**template_data)
