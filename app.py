@@ -197,133 +197,150 @@ def _json(data, status=200):
 
 def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
     """validate required fields and normalize data for template rendering"""
-    
+
     # required fields that must exist
     required_fields = [
-        'responses', 'context', 'result', 'metrics',
-        'company_name', 'assessment_date', 'report_id'
+        "responses",
+        "context",
+        "result",
+        "metrics",
+        "company_name",
+        "assessment_date",
+        "report_id",
     ]
-    
+
     # check for missing required fields
     missing_fields = [field for field in required_fields if field not in raw_data]
     if missing_fields:
         raise ValueError(f"Missing required fields: {missing_fields}")
-    
+
     # extract nested data
-    responses = raw_data.get('responses', {})
-    context = raw_data.get('context', {})
-    result = raw_data.get('result', {})
-    metrics = raw_data.get('metrics', {})
-    
+    responses = raw_data.get("responses", {})
+    context = raw_data.get("context", {})
+    result = raw_data.get("result", {})
+    metrics = raw_data.get("metrics", {})
+
     # normalize to template format
     normalized = {
         # basic metadata
-        'company_name': raw_data.get('company_name', 'your organization'),
-        'assessment_date': raw_data.get('assessment_date', 'unknown'),
-        'report_id': raw_data.get('report_id', 'unknown'),
-        'assessment_id': raw_data.get('assessment_id', 'unknown'),
-        'completion_date': raw_data.get('completion_date', 'unknown'),
-        'customer_email': raw_data.get('customer_email', 'unknown'),
-        
+        "company_name": raw_data.get("company_name", "your organization"),
+        "assessment_date": raw_data.get("assessment_date", "unknown"),
+        "report_id": raw_data.get("report_id", "unknown"),
+        "assessment_id": raw_data.get("assessment_id", "unknown"),
+        "completion_date": raw_data.get("completion_date", "unknown"),
+        "customer_email": raw_data.get("customer_email", "unknown"),
         # archetype data
-        'archetype_primary': result.get('archetype', {}).get('primary', 'unknown'),
-        'archetype_confidence': result.get('archetype', {}).get('confidence', 0),
-        'archetype_tagline': result.get('archetype', {}).get('tagline', ''),
-        'archetype_mix_primary': result.get('archetype', {}).get('mix', {}).get('primary', 0),
-        'archetype_mix_secondary': result.get('archetype', {}).get('mix', {}).get('secondary', 0),
-        'archetype_mix_tertiary': result.get('archetype', {}).get('mix', {}).get('tertiary', 0),
-        'archetype_mix_quaternary': result.get('archetype', {}).get('mix', {}).get('quaternary', 0),
-        'archetype_secondary': result.get('archetype', {}).get('secondary', 'unknown'),
-        'archetype_tertiary': result.get('archetype', {}).get('tertiary', 'unknown'),
-        'archetype_quaternary': result.get('archetype', {}).get('quaternary', 'unknown'),
-        
+        "archetype_primary": result.get("archetype", {}).get("primary", "unknown"),
+        "archetype_confidence": result.get("archetype", {}).get("confidence", 0),
+        "archetype_tagline": result.get("archetype", {}).get("tagline", ""),
+        "archetype_mix_primary": result.get("archetype", {})
+        .get("mix", {})
+        .get("primary", 0),
+        "archetype_mix_secondary": result.get("archetype", {})
+        .get("mix", {})
+        .get("secondary", 0),
+        "archetype_mix_tertiary": result.get("archetype", {})
+        .get("mix", {})
+        .get("tertiary", 0),
+        "archetype_mix_quaternary": result.get("archetype", {})
+        .get("mix", {})
+        .get("quaternary", 0),
+        "archetype_secondary": result.get("archetype", {}).get("secondary", "unknown"),
+        "archetype_tertiary": result.get("archetype", {}).get("tertiary", "unknown"),
+        "archetype_quaternary": result.get("archetype", {}).get(
+            "quaternary", "unknown"
+        ),
         # axis scores
-        'axis_structure': result.get('scores', {}).get('axes', {}).get('structure', 0),
-        'axis_collaboration': result.get('scores', {}).get('axes', {}).get('collaboration', 0),
-        'axis_scope': result.get('scores', {}).get('axes', {}).get('scope', 0),
-        'axis_tempo': result.get('scores', {}).get('axes', {}).get('tempo', 0),
-        
+        "axis_structure": result.get("scores", {}).get("axes", {}).get("structure", 0),
+        "axis_collaboration": result.get("scores", {})
+        .get("axes", {})
+        .get("collaboration", 0),
+        "axis_scope": result.get("scores", {}).get("axes", {}).get("scope", 0),
+        "axis_tempo": result.get("scores", {}).get("axes", {}).get("tempo", 0),
         # metrics
-        'overhead_percentage': metrics.get('overhead_index', 0) * 100,
-        'annual_cost': metrics.get('annual_cost', 0),
-        'hours_lost_ppw': metrics.get('hours_lost_ppw', 0),
-        
+        "overhead_percentage": metrics.get("overhead_index", 0) * 100,
+        "annual_cost": metrics.get("annual_cost", 0),
+        "hours_lost_ppw": metrics.get("hours_lost_ppw", 0),
         # context data
-        'team_size': context.get('team_size', 1),
-        'meeting_load': context.get('meeting_load', 'medium'),
-        'hourly_rate': context.get('hourly_rate', 100),
-        'platform': context.get('platform', 'unknown'),
-        
+        "team_size": context.get("team_size", 1),
+        "meeting_load": context.get("meeting_load", "medium"),
+        "hourly_rate": context.get("hourly_rate", 100),
+        "platform": context.get("platform", "unknown"),
         # recommendations (generate rice scores)
-        'r1_title': 'optimize meeting structure',
-        'r1_description': 'implement structured meeting formats with clear agendas and outcomes',
-        'r1_effort': 'low',
-        'r1_impact': 'high',
-        'r1_timeline': '2 weeks',
-        'r1_rice': 8,
-        
-        'r2_title': 'establish async communication',
-        'r2_description': 'implement async-first communication protocols',
-        'r2_effort': 'medium',
-        'r2_impact': 'high',
-        'r2_timeline': '4 weeks',
-        'r2_rice': 6,
-        
-        'r3_title': 'automate routine tasks',
-        'r3_description': 'implement automation for administrative processes',
-        'r3_effort': 'medium',
-        'r3_impact': 'medium',
-        'r3_timeline': '6 weeks',
-        'r3_rice': 4,
-        
-        'r4_title': 'create decision matrix',
-        'r4_description': 'establish clear decision ownership protocols',
-        'r4_effort': 'low',
-        'r4_impact': 'high',
-        'r4_timeline': '1 week',
-        'r4_rice': 9,
-        
-        'r5_title': 'integrate project systems',
-        'r5_description': 'consolidate project tracking platforms',
-        'r5_effort': 'high',
-        'r5_impact': 'medium',
-        'r5_timeline': '8 weeks',
-        'r5_rice': 3,
-        
+        "r1_title": "optimize meeting structure",
+        "r1_description": "implement structured meeting formats with clear agendas and outcomes",
+        "r1_effort": "low",
+        "r1_impact": "high",
+        "r1_timeline": "2 weeks",
+        "r1_rice": 8,
+        "r2_title": "establish async communication",
+        "r2_description": "implement async-first communication protocols",
+        "r2_effort": "medium",
+        "r2_impact": "high",
+        "r2_timeline": "4 weeks",
+        "r2_rice": 6,
+        "r3_title": "automate routine tasks",
+        "r3_description": "implement automation for administrative processes",
+        "r3_effort": "medium",
+        "r3_impact": "medium",
+        "r3_timeline": "6 weeks",
+        "r3_rice": 4,
+        "r4_title": "create decision matrix",
+        "r4_description": "establish clear decision ownership protocols",
+        "r4_effort": "low",
+        "r4_impact": "high",
+        "r4_timeline": "1 week",
+        "r4_rice": 9,
+        "r5_title": "integrate project systems",
+        "r5_description": "consolidate project tracking platforms",
+        "r5_effort": "high",
+        "r5_impact": "medium",
+        "r5_timeline": "8 weeks",
+        "r5_rice": 3,
         # calculated fields
-        'break_even_timeline': '3-4 months',
-        'team_multiplier': context.get('team_size', 1),
-        'confidence_score': result.get('archetype', {}).get('confidence', 0),
-        'response_count': len(responses) if isinstance(responses, dict) else 0,
-        
+        "break_even_timeline": "3-4 months",
+        "team_multiplier": context.get("team_size", 1),
+        "confidence_score": result.get("archetype", {}).get("confidence", 0),
+        "response_count": len(responses) if isinstance(responses, dict) else 0,
         # top findings
-        'top_findings': result.get('recommendations', {}).get('summary', [
-            'assessment completed successfully',
-            'productivity improvements identified',
-            'implementation roadmap available'
-        ]),
-        
+        "top_findings": result.get("recommendations", {}).get(
+            "summary",
+            [
+                "assessment completed successfully",
+                "productivity improvements identified",
+                "implementation roadmap available",
+            ],
+        ),
         # radar insights
-        'radar_insights': f"archetype analysis shows {result.get('archetype', {}).get('primary', 'unknown')} tendencies with {result.get('archetype', {}).get('confidence', 0)}% confidence",
-        
+        "radar_insights": f"archetype analysis shows {result.get('archetype', {}).get('primary', 'unknown')} tendencies with {result.get('archetype', {}).get('confidence', 0)}% confidence",
         # time breakdown
-        'time_productive': 45,
-        'time_meetings': 25,
-        'time_admin': 20,
-        'time_context_switch': 10,
+        "time_productive": 45,
+        "time_meetings": 25,
+        "time_admin": 20,
+        "time_context_switch": 10,
     }
-    
+
     # validate normalized data has no missing placeholders
     template_placeholders = [
-        'company_name', 'assessment_date', 'report_id', 'archetype_primary',
-        'archetype_confidence', 'overhead_percentage', 'annual_cost',
-        'break_even_timeline', 'r1_rice', 'r2_rice', 'r3_rice', 'r4_rice', 'r5_rice'
+        "company_name",
+        "assessment_date",
+        "report_id",
+        "archetype_primary",
+        "archetype_confidence",
+        "overhead_percentage",
+        "annual_cost",
+        "break_even_timeline",
+        "r1_rice",
+        "r2_rice",
+        "r3_rice",
+        "r4_rice",
+        "r5_rice",
     ]
-    
+
     missing_placeholders = [p for p in template_placeholders if p not in normalized]
     if missing_placeholders:
         raise ValueError(f"Missing template placeholders: {missing_placeholders}")
-    
+
     app.logger.info(f"Normalized data validation passed. Keys: {len(normalized)}")
     return normalized
 
@@ -335,6 +352,9 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(assessment_data, f)
             temp_json_path = f.name
+        
+        app.logger.info(f"Created temp data file: {temp_json_path}")
+        app.logger.info(f"Data file size: {os.path.getsize(temp_json_path)} bytes")
 
         # generate pdf using renderer
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -381,7 +401,10 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         )
 
         if result.returncode != 0:
-            raise Exception(f"renderer failed: {result.stderr}")
+            app.logger.error(f"renderer failed with return code {result.returncode}")
+            app.logger.error(f"renderer stdout: {result.stdout}")
+            app.logger.error(f"renderer stderr: {result.stderr}")
+            raise Exception(f"renderer failed: {result.stderr or result.stdout}")
 
         pdf_path = Path("out") / pdf_filename
         if not pdf_path.exists():
@@ -992,11 +1015,13 @@ def api_stripe_webhook():
 
             # validate and normalize assessment data (hard-fail on missing data)
             try:
-                normalized_data = validate_and_normalize_assessment_data(assessment_data)
+                normalized_data = validate_and_normalize_assessment_data(
+                    assessment_data
+                )
             except ValueError as e:
                 app.logger.error(f"Data validation failed: {e}")
                 return _json({"error": f"Invalid assessment data: {e}"}, status=400)
-            
+
             # generate pdf and get s3 url (locked pipeline order)
             pdf_url = generate_pdf_report(normalized_data, customer_email)
 
