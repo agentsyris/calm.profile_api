@@ -1,0 +1,402 @@
+/* calm.profile report print styles */
+
+@page {
+  size: A4;
+  margin: 28mm 24mm;
+  @bottom-center {
+    content: counter(page);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    color: #666666;
+  }
+}
+
+/* page breaks */
+.page-break {
+  page-break-before: always;
+}
+
+.page-break:first-child {
+  page-break-before: avoid;
+}
+
+/* font imports */
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* base typography */
+body {
+  font-family: "JetBrains Mono", monospace;
+  color: #0a0a0a;
+  line-height: 1.6;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* systematic lowercase transformation */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+button,
+input,
+select,
+label,
+td,
+th,
+li,
+strong,
+em,
+a,
+blockquote,
+caption {
+  text-transform: lowercase;
+}
+
+/* heading hierarchy - inter font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #0a0a0a;
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  margin-top: 32px;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  margin-top: 24px;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  margin-top: 16px;
+  page-break-after: avoid;
+}
+
+/* accent (one per page, linter counts .teal-accent) */
+.teal-accent {
+  color: #00c9a7;
+  stroke: #00c9a7;
+  fill: #00c9a7;
+}
+
+/* small accent dot used in legends/ticks */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  display: inline-block;
+  background: #00c9a7;
+}
+
+/* meta information - jetbrains mono */
+.meta {
+  color: #666666;
+  font-size: 12px;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+
+/* systematic spacing */
+.section {
+  margin-bottom: 24px;
+  page-break-inside: avoid;
+}
+
+.page-break {
+  page-break-before: always;
+}
+
+/* tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  page-break-inside: avoid;
+}
+
+th,
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+th {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: #666666;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+td {
+  color: #0a0a0a;
+}
+
+/* lists */
+ul,
+ol {
+  margin: 0;
+  padding-left: 20px;
+  page-break-inside: avoid;
+}
+
+li {
+  margin-bottom: 8px;
+  color: #333333;
+  line-height: 1.5;
+}
+
+/* figure captions */
+figure {
+  margin: 16px 0;
+  page-break-inside: avoid;
+}
+
+figcaption {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: #666666;
+  font-style: italic;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+/* monochrome charts */
+.chart {
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+  page-break-inside: avoid;
+}
+
+.chart svg {
+  width: 100%;
+  height: auto;
+}
+
+/* chart styling - monochrome palette only */
+.chart-fill-1 {
+  fill: #000000;
+}
+.chart-fill-2 {
+  fill: #333333;
+}
+.chart-fill-3 {
+  fill: #666666;
+}
+.chart-fill-4 {
+  fill: #999999;
+}
+.chart-fill-5 {
+  fill: #cccccc;
+}
+.chart-fill-6 {
+  fill: #e5e5e5;
+}
+.chart-fill-7 {
+  fill: #f5f5f5;
+}
+.chart-stroke-1 {
+  stroke: #000000;
+}
+.chart-stroke-2 {
+  stroke: #333333;
+}
+.chart-stroke-3 {
+  stroke: #666666;
+}
+.chart-stroke-4 {
+  stroke: #999999;
+}
+.chart-stroke-5 {
+  stroke: #cccccc;
+}
+
+/* emphasis */
+strong,
+b {
+  font-weight: 500;
+  color: #0a0a0a;
+}
+
+em,
+i {
+  font-style: italic;
+  color: #333333;
+}
+
+/* code and technical content - jetbrains mono */
+code,
+pre {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background-color: #f8f8f8;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+pre {
+  padding: 12px;
+  margin: 16px 0;
+  border: 1px solid #e5e5e5;
+  page-break-inside: avoid;
+}
+
+/* blockquotes */
+blockquote {
+  margin: 16px 0;
+  padding-left: 16px;
+  border-left: 3px solid #e5e5e5;
+  color: #333333;
+  font-style: italic;
+  page-break-inside: avoid;
+}
+
+/* horizontal rules */
+hr {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 32px 0;
+  page-break-inside: avoid;
+}
+
+/* footer */
+.footer {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: #999999;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* print optimizations */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .no-break {
+    page-break-inside: avoid;
+  }
+
+  /* ensure charts don't break across pages */
+  .chart,
+  img,
+  svg {
+    page-break-inside: avoid;
+    max-height: 80vh;
+  }
+
+  /* optimize table breaks */
+  table {
+    page-break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* high contrast mode support */
+@media (prefers-contrast: high) {
+  body {
+    color: #000000;
+  }
+
+  th,
+  td {
+    border-color: #000000;
+  }
+
+  .chart-stroke-1,
+  .chart-stroke-2,
+  .chart-stroke-3 {
+    stroke-width: 2px;
+  }
+}

@@ -1,0 +1,70 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <title>workflow efficiency heatmap</title>
+  <desc>heatmap showing process efficiency scores across key activities and days of the week. darker colors indicate higher efficiency.</desc>
+  <defs>
+    <style>
+      .heatmap-cell { stroke: #ffffff; stroke-width: 1; }
+      .heatmap-1 { fill: #f0f0f0; }
+      .heatmap-2 { fill: #d0d0d0; }
+      .heatmap-3 { fill: #a0a0a0; }
+      .heatmap-4 { fill: #707070; }
+      .heatmap-5 { fill: #404040; }
+      .heatmap-6 { fill: #000000; }
+      .teal-accent { fill: #00c9a7; }
+      .label { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: #333333; }
+      .axis-label { font-family: 'Inter', sans-serif; font-size: 10px; fill: #000000; }
+    </style>
+  </defs>
+  
+  <!-- heatmap grid -->
+  <rect x="50" y="30" width="30" height="20" class="heatmap-cell teal-accent"/>
+  <rect x="80" y="30" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="110" y="30" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  <rect x="140" y="30" width="30" height="20" class="heatmap-cell heatmap-3"/>
+  <rect x="170" y="30" width="30" height="20" class="heatmap-cell heatmap-2"/>
+  
+  <rect x="50" y="50" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="80" y="50" width="30" height="20" class="heatmap-cell heatmap-6"/>
+  <rect x="110" y="50" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="140" y="50" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  <rect x="170" y="50" width="30" height="20" class="heatmap-cell heatmap-3"/>
+  
+  <rect x="50" y="70" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  <rect x="80" y="70" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="110" y="70" width="30" height="20" class="heatmap-cell heatmap-6"/>
+  <rect x="140" y="70" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="170" y="70" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  
+  <rect x="50" y="90" width="30" height="20" class="heatmap-cell heatmap-3"/>
+  <rect x="80" y="90" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  <rect x="110" y="90" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="140" y="90" width="30" height="20" class="heatmap-cell heatmap-6"/>
+  <rect x="170" y="90" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  
+  <rect x="50" y="110" width="30" height="20" class="heatmap-cell heatmap-2"/>
+  <rect x="80" y="110" width="30" height="20" class="heatmap-cell heatmap-3"/>
+  <rect x="110" y="110" width="30" height="20" class="heatmap-cell heatmap-4"/>
+  <rect x="140" y="110" width="30" height="20" class="heatmap-cell heatmap-5"/>
+  <rect x="170" y="110" width="30" height="20" class="heatmap-cell heatmap-6"/>
+  
+  <!-- row labels -->
+  <text x="40" y="42" text-anchor="end" class="axis-label">planning</text>
+  <text x="40" y="62" text-anchor="end" class="axis-label">execution</text>
+  <text x="40" y="82" text-anchor="end" class="axis-label">review</text>
+  <text x="40" y="102" text-anchor="end" class="axis-label">communication</text>
+  <text x="40" y="122" text-anchor="end" class="axis-label">coordination</text>
+  
+  <!-- column labels -->
+  <text x="65" y="25" text-anchor="middle" class="axis-label">monday</text>
+  <text x="95" y="25" text-anchor="middle" class="axis-label">tuesday</text>
+  <text x="125" y="25" text-anchor="middle" class="axis-label">wednesday</text>
+  <text x="155" y="25" text-anchor="middle" class="axis-label">thursday</text>
+  <text x="185" y="25" text-anchor="middle" class="axis-label">friday</text>
+  
+  <!-- efficiency values -->
+  <text x="65" y="42" text-anchor="middle" class="label">9</text>
+  <text x="95" y="42" text-anchor="middle" class="label">8</text>
+  <text x="125" y="42" text-anchor="middle" class="label">7</text>
+  <text x="155" y="42" text-anchor="middle" class="label">6</text>
+  <text x="185" y="42" text-anchor="middle" class="label">5</text>
+</svg>

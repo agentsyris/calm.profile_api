@@ -1,0 +1,67 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <title>12-month savings projection</title>
+  <desc>Line chart showing projected monthly savings over 12 months, demonstrating clear path to positive ROI</desc>
+  
+  <!-- Chart background -->
+  <rect x="50" y="30" width="320" height="140" fill="none" stroke="#333" stroke-width="1"/>
+  
+  <!-- Grid lines -->
+  <g stroke="#ddd" stroke-width="0.5">
+    <line x1="50" y1="50" x2="370" y2="50"/>
+    <line x1="50" y1="70" x2="370" y2="70"/>
+    <line x1="50" y1="90" x2="370" y2="90"/>
+    <line x1="50" y1="110" x2="370" y2="110"/>
+    <line x1="50" y1="130" x2="370" y2="130"/>
+    <line x1="50" y1="150" x2="370" y2="150"/>
+  </g>
+  
+  <!-- Month markers -->
+  <g font-family="JetBrains Mono" font-size="10" fill="#333" text-anchor="middle">
+    <text x="70" y="165">1</text>
+    <text x="90" y="165">2</text>
+    <text x="110" y="165">3</text>
+    <text x="130" y="165">4</text>
+    <text x="150" y="165">5</text>
+    <text x="170" y="165">6</text>
+    <text x="190" y="165">7</text>
+    <text x="210" y="165">8</text>
+    <text x="230" y="165">9</text>
+    <text x="250" y="165">10</text>
+    <text x="270" y="165">11</text>
+    <text x="290" y="165">12</text>
+  </g>
+  
+  <!-- Y-axis labels -->
+  <g font-family="JetBrains Mono" font-size="10" fill="#333" text-anchor="end">
+    <text x="45" y="155">$0</text>
+    <text x="45" y="135">$5k</text>
+    <text x="45" y="115">$10k</text>
+    <text x="45" y="95">$15k</text>
+    <text x="45" y="75">$20k</text>
+    <text x="45" y="55">$25k</text>
+  </g>
+  
+  <!-- Savings line -->
+  <polyline points="70,150 90,145 110,135 130,120 150,100 170,85 190,75 210,70 230,65 250,60 270,55 290,50" 
+            fill="none" stroke="#333" stroke-width="2"/>
+  
+  <!-- Data points -->
+  <g fill="#333">
+    <circle cx="70" cy="150" r="3"/>
+    <circle cx="90" cy="145" r="3"/>
+    <circle cx="110" cy="135" r="3"/>
+    <circle cx="130" cy="120" r="3"/>
+    <circle cx="150" cy="100" r="3"/>
+    <circle cx="170" cy="85" r="3"/>
+    <circle cx="190" cy="75" r="3"/>
+    <circle cx="210" cy="70" r="3"/>
+    <circle cx="230" cy="65" r="3"/>
+    <circle cx="250" cy="60" r="3"/>
+    <circle cx="270" cy="55" r="3"/>
+    <circle cx="290" cy="50" r="3"/>
+  </g>
+  
+  <!-- Chart title -->
+  <text x="200" y="20" font-family="Inter" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">12-month savings projection</text>
+</svg>
+

@@ -1,0 +1,43 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <title>time allocation pie chart</title>
+  <desc>pie chart showing current time distribution across work activities: productive work, meetings, administrative tasks, and context switching.</desc>
+  <defs>
+    <style>
+      .slice-1 { fill: #000000; }
+      .slice-2 { fill: #333333; }
+      .slice-3 { fill: #666666; }
+      .slice-4 { fill: #999999; }
+      .teal-accent { fill: #00c9a7; }
+      .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #ffffff; }
+      .legend-text { font-family: 'Inter', sans-serif; font-size: 11px; fill: #333333; }
+    </style>
+  </defs>
+  
+  <!-- pie slices -->
+  <path d="M 150 150 L 150 50 A 100 100 0 0 1 200 150 Z" class="teal-accent"/>
+  <path d="M 200 150 L 150 150 A 100 100 0 0 1 150 250 Z" class="slice-2"/>
+  <path d="M 150 250 L 150 150 A 100 100 0 0 1 100 150 Z" class="slice-3"/>
+  <path d="M 100 150 L 150 150 A 100 100 0 0 1 150 50 Z" class="slice-4"/>
+  
+  <!-- center circle -->
+  <circle cx="150" cy="150" r="30" fill="#ffffff"/>
+  
+  <!-- labels on slices -->
+  <text x="175" y="100" text-anchor="middle" class="label">45%</text>
+  <text x="175" y="200" text-anchor="middle" class="label">25%</text>
+  <text x="125" y="200" text-anchor="middle" class="label">20%</text>
+  <text x="125" y="100" text-anchor="middle" class="label">10%</text>
+  
+  <!-- legend -->
+  <rect x="220" y="50" width="12" height="12" class="slice-1"/>
+  <text x="240" y="60" class="legend-text">productive work</text>
+  
+  <rect x="220" y="70" width="12" height="12" class="slice-2"/>
+  <text x="240" y="80" class="legend-text">meetings</text>
+  
+  <rect x="220" y="90" width="12" height="12" class="slice-3"/>
+  <text x="240" y="100" class="legend-text">admin tasks</text>
+  
+  <rect x="220" y="110" width="12" height="12" class="slice-4"/>
+  <text x="240" y="120" class="legend-text">context switching</text>
+</svg>

@@ -1,0 +1,66 @@
+<svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+  <title>savings timeline chart</title>
+  <desc>line chart showing projected savings over 12-month implementation timeline with data points and trend line.</desc>
+  <defs>
+    <style>
+      .line { stroke: #000000; stroke-width: 2; fill: none; }
+      .area { fill: rgba(0,0,0,0.1); }
+      .grid-line { stroke: #cccccc; stroke-width: 0.5; }
+      .axis-line { stroke: #333333; stroke-width: 1; }
+      .data-point { fill: #000000; }
+      .label { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: #333333; }
+      .axis-label { font-family: 'Inter', sans-serif; font-size: 10px; fill: #333333; }
+      .teal-accent { fill: #00c9a7; }
+    </style>
+  </defs>
+  
+  <!-- grid lines -->
+  <line x1="50" y1="50" x2="350" y2="50" class="grid-line"/>
+  <line x1="50" y1="100" x2="350" y2="100" class="grid-line"/>
+  <line x1="50" y1="150" x2="350" y2="150" class="grid-line"/>
+  <line x1="50" y1="200" x2="350" y2="200" class="grid-line"/>
+  
+  <!-- axes -->
+  <line x1="50" y1="20" x2="50" y2="220" class="axis-line"/>
+  <line x1="50" y1="220" x2="350" y2="220" class="axis-line"/>
+  
+  <!-- savings line -->
+  <path d="M 70 200 Q 120 180 170 160 T 270 120 T 330 80" class="line"/>
+  
+  <!-- area under curve -->
+  <path d="M 70 220 L 70 200 Q 120 180 170 160 T 270 120 T 330 80 L 330 220 Z" class="area"/>
+  
+  <!-- data points -->
+  <circle cx="70" cy="200" r="3" class="data-point"/>
+  <circle cx="120" cy="180" r="3" class="data-point"/>
+  <circle cx="170" cy="160" r="3" class="data-point"/>
+  <circle cx="220" cy="140" r="3" class="data-point"/>
+  <circle cx="270" cy="120" r="3" class="data-point"/>
+  <circle cx="320" cy="100" r="3" class="data-point"/>
+  <circle cx="330" cy="80" r="3" class="teal-accent"/>
+  
+  <!-- y-axis labels -->
+  <text x="45" y="25" text-anchor="end" class="label">$50k</text>
+  <text x="45" y="55" text-anchor="end" class="label">$40k</text>
+  <text x="45" y="105" text-anchor="end" class="label">$30k</text>
+  <text x="45" y="155" text-anchor="end" class="label">$20k</text>
+  <text x="45" y="205" text-anchor="end" class="label">$10k</text>
+  <text x="45" y="225" text-anchor="end" class="label">$0</text>
+  
+  <!-- x-axis labels -->
+  <text x="70" y="235" text-anchor="middle" class="axis-label">month 1</text>
+  <text x="120" y="235" text-anchor="middle" class="axis-label">month 2</text>
+  <text x="170" y="235" text-anchor="middle" class="axis-label">month 3</text>
+  <text x="220" y="235" text-anchor="middle" class="axis-label">month 6</text>
+  <text x="270" y="235" text-anchor="middle" class="axis-label">month 9</text>
+  <text x="320" y="235" text-anchor="middle" class="axis-label">month 12</text>
+  
+  <!-- savings values -->
+  <text x="70" y="195" text-anchor="middle" class="label">$8k</text>
+  <text x="120" y="175" text-anchor="middle" class="label">$12k</text>
+  <text x="170" y="155" text-anchor="middle" class="label">$18k</text>
+  <text x="220" y="135" text-anchor="middle" class="label">$25k</text>
+  <text x="270" y="115" text-anchor="middle" class="label">$32k</text>
+  <text x="320" y="95" text-anchor="middle" class="label">$38k</text>
+  <text x="330" y="75" text-anchor="middle" class="label">$42k</text>
+</svg>

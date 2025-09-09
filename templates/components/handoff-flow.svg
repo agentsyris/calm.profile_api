@@ -1,0 +1,62 @@
+<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <title>workflow handoff flow</title>
+  <desc>handoff flow diagram showing workflow handoffs and decision points across different team roles, revealing communication gaps and process inefficiencies.</desc>
+  <defs>
+    <style>
+      .handoff-box { fill: #f8f8f8; stroke: #333333; stroke-width: 1; }
+      .handoff-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #000000; }
+      .role-label { font-family: 'Inter', sans-serif; font-size: 11px; fill: #333333; }
+      .handoff-arrow { stroke: #000000; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .decision-diamond { fill: #e5e5e5; stroke: #666666; stroke-width: 1; }
+      .teal-accent { fill: #00c9a7; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000000"/>
+    </marker>
+  </defs>
+  
+  <!-- workflow stages -->
+  <rect x="50" y="50" width="80" height="40" class="handoff-box"/>
+  <text x="90" y="72" text-anchor="middle" class="handoff-text">intake</text>
+  
+  <rect x="150" y="50" width="80" height="40" class="handoff-box"/>
+  <text x="190" y="72" text-anchor="middle" class="handoff-text">scoping</text>
+  
+  <rect x="250" y="50" width="80" height="40" class="handoff-box"/>
+  <text x="290" y="72" text-anchor="middle" class="handoff-text">production</text>
+  
+  <rect x="350" y="50" width="80" height="40" class="handoff-box"/>
+  <text x="390" y="72" text-anchor="middle" class="handoff-text">qa</text>
+  
+  <!-- decision points -->
+  <polygon points="200,150 220,130 240,150 220,170" class="decision-diamond"/>
+  <text x="220" y="152" text-anchor="middle" class="handoff-text">approve?</text>
+  
+  <polygon points="300,150 320,130 340,150 320,170" class="decision-diamond"/>
+  <text x="320" y="152" text-anchor="middle" class="handoff-text">ready?</text>
+  
+  <!-- handoff arrows -->
+  <line x1="130" y1="70" x2="150" y2="70" class="handoff-arrow"/>
+  <line x1="230" y1="70" x2="250" y2="70" class="handoff-arrow"/>
+  <line x1="330" y1="70" x2="350" y2="70" class="handoff-arrow"/>
+  
+  <!-- decision arrows -->
+  <line x1="190" y1="90" x2="220" y2="130" class="handoff-arrow"/>
+  <line x1="290" y1="90" x2="320" y2="130" class="handoff-arrow"/>
+  
+  <!-- role labels -->
+  <text x="90" y="40" text-anchor="middle" class="role-label">account</text>
+  <text x="190" y="40" text-anchor="middle" class="role-label">pm</text>
+  <text x="290" y="40" text-anchor="middle" class="role-label">creative</text>
+  <text x="390" y="40" text-anchor="middle" class="role-label">ops</text>
+  
+  <!-- handoff labels -->
+  <text x="140" y="65" text-anchor="middle" class="handoff-text">brief</text>
+  <text x="240" y="65" text-anchor="middle" class="handoff-text">scope</text>
+  <text x="340" y="65" text-anchor="middle" class="handoff-text">deliver</text>
+  
+  <!-- bottleneck indicators -->
+  <circle cx="200" cy="200" r="8" class="teal-accent"/>
+  <text x="200" y="220" text-anchor="middle" class="handoff-text">bottleneck</text>
+</svg>
+

@@ -1,0 +1,271 @@
+{
+  "company_name": "acme corp",
+  "assessment_date": "dec 15, 2024",
+  "report_id": "acme-2024-001",
+  "assessment_id": "assess_abc123",
+  "completion_date": "2024-12-15",
+  "response_count": 20,
+  "confidence_score": 87.5,
+
+  "archetype_primary": "architect",
+  "archetype_confidence": 87.5,
+  "archetype_tagline": "systematic builders of scalable foundations",
+  "archetype_mix_primary": 65.0,
+  "archetype_mix_secondary": 20.0,
+  "archetype_mix_tertiary": 10.0,
+  "archetype_mix_quaternary": 5.0,
+  "archetype_secondary": "conductor",
+  "archetype_tertiary": "curator",
+  "archetype_quaternary": "craftsperson",
+
+  "axis_structure": 85,
+  "axis_collaboration": 35,
+  "axis_scope": 70,
+  "axis_tempo": 40,
+
+  "archetype_strengths": [
+    "framework design",
+    "process optimization",
+    "long-term planning",
+    "system integration"
+  ],
+
+  "overhead_percentage": 15.2,
+  "annual_cost": 106080,
+  "hours_lost_ppw": 6,
+  "team_multiplier": 4,
+  "break_even_timeline": "3-4 months",
+
+  "top_findings": [
+    "strong preference for structured approaches with moderate collaboration needs",
+    "excellent foundation for systematic improvements with clear path to 35% productivity gains",
+    "communication delays and context switching overhead identified as primary bottlenecks"
+  ],
+
+  "radar_insights": "strong preference for structured approaches with moderate collaboration needs. excels in systematic thinking and framework development.",
+
+  "time_productive": 45,
+  "time_meetings": 25,
+  "time_admin": 20,
+  "time_context_switch": 10,
+  "time_optimization": "reduce meeting overhead by 40% through async protocols and streamline administrative processes with automation tools.",
+
+  "efficiency_planning": 9,
+  "efficiency_execution": 7,
+  "efficiency_review": 8,
+  "efficiency_communication": 6,
+  "workflow_bottlenecks": "communication delays and context switching overhead. meetings are inefficient and lack clear agendas.",
+
+  "workflow1_name": "intake",
+  "workflow1_r": "pm, account manager",
+  "workflow1_a": "cto",
+  "workflow1_s": "design team",
+  "workflow1_c": "",
+  "workflow1_i": "",
+
+  "workflow2_name": "scoping",
+  "workflow2_r": "pm, design lead",
+  "workflow2_a": "creative director",
+  "workflow2_s": "engineering leads",
+  "workflow2_c": "",
+  "workflow2_i": "",
+
+  "workflow3_name": "production",
+  "workflow3_r": "engineering lead, design team",
+  "workflow3_a": "cto",
+  "workflow3_s": "qa team",
+  "workflow3_c": "",
+  "workflow3_i": "",
+
+  "workflow4_name": "qa",
+  "workflow4_r": "qa team, engineering lead",
+  "workflow4_a": "cto",
+  "workflow4_s": "pm",
+  "workflow4_c": "",
+  "workflow4_i": "",
+
+  "workflow5_name": "delivery/invoicing",
+  "workflow5_r": "ops team, account manager",
+  "workflow5_a": "pm",
+  "workflow5_s": "engineering",
+  "workflow5_c": "",
+  "workflow5_i": "",
+
+  "f1_issue": "inefficient meeting patterns",
+  "f1_evidence": "25% of time spent in meetings with unclear agendas",
+  "f1_impact": "6.1 hours lost per week per person",
+  "f1_root_cause": "lack of structured meeting protocols",
+  "f1_preview": "implement async-first communication and structured meeting templates",
+
+  "f2_issue": "context switching overhead",
+  "f2_evidence": "10% of time lost to task switching",
+  "f2_impact": "2.4 hours per week per person",
+  "f2_root_cause": "fragmented communication channels",
+  "f2_preview": "consolidate communication to single platform with maker time blocks",
+
+  "f3_issue": "administrative task burden",
+  "f3_evidence": "20% of time on non-productive admin work",
+  "f3_impact": "4.8 hours per week per person",
+  "f3_root_cause": "lack of automation and process optimization",
+  "f3_preview": "implement automation tools and process templates",
+
+  "f4_issue": "unclear decision ownership",
+  "f4_evidence": "delayed decisions due to unclear responsibility",
+  "f4_impact": "3.2 hours per week per person",
+  "f4_root_cause": "missing decision framework",
+  "f4_preview": "establish rasic matrix and decision protocols",
+
+  "f5_issue": "project tracking fragmentation",
+  "f5_evidence": "multiple tools without integration",
+  "f5_impact": "2.8 hours per week per person",
+  "f5_root_cause": "lack of centralized project management",
+  "f5_preview": "implement integrated project tracking system",
+
+  "base_overhead": 12.0,
+  "archetype_adjustment": 1.27,
+  "hourly_rate": 85,
+  "weekly_cost": 2040,
+  "savings_month1": 5,
+  "savings_month3": 15,
+  "savings_month6": 25,
+  "savings_month12": 35,
+
+  "sensitivity_conservative_overhead": 12.0,
+  "team_size": 4,
+  "sensitivity_conservative_cost": 100000,
+  "sensitivity_conservative_savings": 25,
+  "sensitivity_conservative_payback": "4-5 months",
+
+  "sensitivity_optimistic_overhead": 8.0,
+  "sensitivity_optimistic_cost": 150000,
+  "sensitivity_optimistic_savings": 45,
+  "sensitivity_optimistic_payback": "2-3 months",
+
+  "conservative_5yr": 500000,
+  "realistic_5yr": 750000,
+  "optimistic_5yr": 1000000,
+
+  "r1_title": "implement project templates",
+  "r1_linked_finding": "1",
+  "r1_description": "create standardized project templates for common workflows",
+  "r1_effort": "low",
+  "r1_impact": "high",
+  "r1_timeline": "2 weeks",
+  "r1_rice": "8",
+
+  "r2_title": "establish async communication protocols",
+  "r2_linked_finding": "2",
+  "r2_description": "implement async-first communication with structured updates",
+  "r2_effort": "medium",
+  "r2_impact": "high",
+  "r2_timeline": "4 weeks",
+  "r2_rice": "6",
+
+  "r3_title": "automate administrative processes",
+  "r3_linked_finding": "3",
+  "r3_description": "implement automation tools for routine administrative tasks",
+  "r3_effort": "medium",
+  "r3_impact": "medium",
+  "r3_timeline": "6 weeks",
+  "r3_rice": "4",
+
+  "r4_title": "create decision ownership matrix",
+  "r4_linked_finding": "4",
+  "r4_description": "establish clear decision ownership and escalation protocols",
+  "r4_effort": "low",
+  "r4_impact": "high",
+  "r4_timeline": "1 week",
+  "r4_rice": "9",
+
+  "r5_title": "integrate project tracking systems",
+  "r5_linked_finding": "5",
+  "r5_description": "consolidate project tracking into single integrated platform",
+  "r5_effort": "high",
+  "r5_impact": "medium",
+  "r5_timeline": "8 weeks",
+  "r5_rice": "3",
+
+  "rasic_initiative1": "template implementation",
+  "rasic_r1": "pm",
+  "rasic_a1": "cto",
+  "rasic_s1": "design team",
+  "rasic_c1": "engineering leads",
+  "rasic_i1": "all teams",
+
+  "rasic_initiative2": "async protocols",
+  "rasic_r2": "pm",
+  "rasic_a2": "engineering manager",
+  "rasic_s2": "all teams",
+  "rasic_c2": "stakeholders",
+  "rasic_i2": "all teams",
+
+  "rasic_initiative3": "automation setup",
+  "rasic_r3": "devops",
+  "rasic_a3": "pm",
+  "rasic_s3": "engineering",
+  "rasic_c3": "qa team",
+  "rasic_i3": "all teams",
+
+  "rasic_initiative4": "decision framework",
+  "rasic_r4": "team leads",
+  "rasic_a4": "pm",
+  "rasic_s4": "all teams",
+  "rasic_c4": "management",
+  "rasic_i4": "all teams",
+
+  "critical_path": "template implementation → automation setup → team adoption → optimization",
+  "milestone_schedule": "week 2: templates deployed, week 4: automation active, week 6: full team adoption, week 8: optimization complete",
+
+  "roadmap_30_days": [
+    "implement project templates (PM)",
+    "establish decision ownership matrix (CTO)",
+    "create async communication protocols (PM)"
+  ],
+
+  "roadmap_60_days": [
+    "deploy automation tools (ENG)",
+    "integrate project tracking systems (OPS)",
+    "train team on new processes (PM)"
+  ],
+
+  "roadmap_90_days": [
+    "optimize workflows based on feedback (CTO)",
+    "scale successful practices (PM)",
+    "measure and report on improvements (OPS)"
+  ],
+
+  "roadmap_kpis": [
+    "15% productivity improvement in month 1",
+    "25% meeting reduction",
+    "90% template adoption",
+    "35% annual cost savings by month 12"
+  ],
+
+  "baseline_ontime": 65,
+  "target_ontime": 85,
+  "owner_ontime": "PM",
+  "baseline_latency": 15,
+  "target_latency": 8,
+  "owner_latency": "ENG",
+  "baseline_variance": 25,
+  "target_variance": 12,
+  "owner_variance": "PM",
+  "baseline_change": 40,
+  "target_change": 75,
+  "owner_change": "OPS",
+
+  "next_steps": "implement templates immediately, reduce meeting overhead by 50%, protect maker time with async protocols, establish clear decision ownership.",
+
+  "sensitivity_25_margin": 2.5,
+  "sensitivity_25_cost": 45000,
+  "sensitivity_25_hours": 120,
+  "sensitivity_50_margin": 5.0,
+  "sensitivity_50_cost": 90000,
+  "sensitivity_50_hours": 240,
+  "sensitivity_75_margin": 7.5,
+  "sensitivity_75_cost": 135000,
+  "sensitivity_75_hours": 360,
+
+  "technical_notes": "assessment based on 20 behavioral indicators across 4 core axes: structure, collaboration, scope, and tempo. calibrated against team context variables including meeting load, team size, and hourly rates.",
+  "data_sources": "calm.profile assessment system, team context variables, industry benchmarks, behavioral psychology research, productivity studies."
+}
