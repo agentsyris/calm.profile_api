@@ -45,6 +45,13 @@ def fmt_hours(x):
     return f"{float(x):.1f}"
 
 
+def fmt_round(x, digits=0):
+    """format number with specified decimal places"""
+    if x is None:
+        return "0"
+    return f"{float(x):.{digits}f}"
+
+
 def fmt_confidence(x):
     """format confidence percentage or show unavailable message"""
     if x is None or x == 0 or x == 0.0:
