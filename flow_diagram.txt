@@ -1,0 +1,80 @@
+CALM.PROFILE GENERATE_REPORT FLOW DIAGRAM
+==========================================
+
+Stripe Webhook Event: checkout.session.completed
+│
+├─ 1. WEBHOOK VALIDATION
+│   ├─ Verify Stripe signature
+│   ├─ Check for duplicate events
+│   └─ Extract session metadata
+│
+├─ 2. DATA EXTRACTION
+│   ├─ Fetch Assessment from database
+│   ├─ Parse JSON data blob
+│   └─ Add metadata (assessment_date, report_id, customer_email)
+│
+├─ 3. BUILD_DATA PHASE ⭐
+│   ├─ validate_and_normalize_assessment_data()
+│   ├─ Required fields validation
+│   ├─ Schema mapping (camelCase → snake_case)
+│   ├─ Template field validation
+│   └─ Default value injection
+│
+├─ 4. RENDER_TEMPLATE PHASE ⭐
+│   ├─ ReportRenderer.render_template()
+│   ├─ Jinja2 template loading
+│   ├─ StrictUndefined validation
+│   ├─ Formatting functions injection
+│   └─ Template rendering
+│
+├─ 5. RENDER_PDF PHASE ⭐
+│   ├─ ReportRenderer.render_to_pdf()
+│   ├─ Image path injection
+│   ├─ Markdown to HTML conversion
+│   ├─ CSS integration
+│   ├─ Page count validation
+│   ├─ Brand compliance validation
+│   └─ WeasyPrint PDF generation
+│
+├─ 6. SEND_EMAIL PHASE ⭐
+│   ├─ send_report_email()
+│   ├─ PDF attachment handling
+│   ├─ Postmark API integration
+│   └─ Error logging
+│
+└─ 7. COMPLETION
+    ├─ Update Payment record
+    ├─ Database commit
+    └─ Status tracking
+
+KEY VERIFICATION POINTS:
+=======================
+
+✅ SEQUENCE VERIFICATION:
+   build_data → render_template → render_pdf → send_email
+
+✅ WEBHOOK INTEGRATION:
+   - Stripe webhook calls generate_pdf_report()
+   - Full normalized payload passed through
+   - Proper error handling and logging
+
+✅ DATA VALIDATION:
+   - Schema-driven normalization
+   - Template field completeness
+   - Type validation
+   - Default value injection
+
+✅ ERROR HANDLING:
+   - Hard-fail on missing data
+   - Graceful degradation
+   - Comprehensive logging
+   - Database rollback on failure
+
+CRITICAL SUCCESS FACTORS:
+========================
+
+1. Schema Validation: All template fields must be present
+2. Jinja2 StrictUndefined: Prevents unresolved placeholders
+3. Proper Sequence: Each phase depends on previous success
+4. Error Propagation: Failures bubble up with context
+5. Data Integrity: Normalized payload ensures consistency
