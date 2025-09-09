@@ -79,7 +79,11 @@ class ReportRenderer:
             key_with_format = match.group(1)
             # extract the base key (remove formatting like :,)
             key = key_with_format.split(":")[0]
-            value = data.get(key, f"${key}")
+            value = data.get(key)
+
+            # hard-fail on missing required placeholders
+            if value is None:
+                raise ValueError(f"Missing required template placeholder: ${key}")
 
             # handle special formatting using utilities
             if isinstance(value, (int, float)):
