@@ -198,7 +198,7 @@ def _json(data, status=200):
 def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
     """validate required fields and normalize data for template rendering"""
     from renderer.schema import to_report_fields, validate_template_fields
-    
+
     # required fields that must exist
     required_fields = [
         "responses",
@@ -230,7 +230,6 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         "assessment_id": raw_data.get("assessment_id", "unknown"),
         "completion_date": raw_data.get("completion_date", "unknown"),
         "customer_email": raw_data.get("customer_email", "unknown"),
-        
         # archetype data
         "archetype_primary": result.get("archetype", {}).get("primary", "unknown"),
         "archetype_confidence": result.get("archetype", {}).get("confidence", 0),
@@ -320,11 +319,136 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         "time_meetings": 25,
         "time_admin": 20,
         "time_context_switch": 10,
+        
+        # workflow data (rasci matrix)
+        "workflow1_r": "pm",
+        "workflow1_a": "cto",
+        "workflow1_s": "design team",
+        "workflow1_c": "account",
+        "workflow1_i": "ops",
+        
+        "workflow2_r": "pm",
+        "workflow2_a": "cto", 
+        "workflow2_s": "design team",
+        "workflow2_c": "account",
+        "workflow2_i": "ops",
+        
+        "workflow3_r": "pm",
+        "workflow3_a": "cto",
+        "workflow3_s": "design team", 
+        "workflow3_c": "account",
+        "workflow3_i": "ops",
+        
+        "workflow4_r": "pm",
+        "workflow4_a": "cto",
+        "workflow4_s": "design team",
+        "workflow4_c": "account", 
+        "workflow4_i": "ops",
+        
+        "workflow5_r": "pm",
+        "workflow5_a": "cto",
+        "workflow5_s": "design team",
+        "workflow5_c": "account",
+        "workflow5_i": "ops",
+        
+        # findings details
+        "f1_issue": "meeting inefficiency",
+        "f1_evidence": "excessive meeting time without clear outcomes",
+        "f1_impact": "high",
+        "f1_root_cause": "lack of structured meeting formats",
+        "f1_preview": "implement structured meeting protocols",
+        
+        "f2_issue": "communication delays",
+        "f2_evidence": "context switching overhead",
+        "f2_impact": "high", 
+        "f2_root_cause": "async communication gaps",
+        "f2_preview": "establish async communication protocols",
+        
+        "f3_issue": "administrative overhead",
+        "f3_evidence": "routine task repetition",
+        "f3_impact": "medium",
+        "f3_root_cause": "manual process inefficiency",
+        "f3_preview": "implement automation tools",
+        
+        "f4_issue": "decision bottlenecks",
+        "f4_evidence": "delayed decision making",
+        "f4_impact": "high",
+        "f4_root_cause": "unclear decision ownership",
+        "f4_preview": "create decision matrix",
+        
+        "f5_issue": "system fragmentation",
+        "f5_evidence": "multiple tracking platforms",
+        "f5_impact": "medium",
+        "f5_root_cause": "lack of integrated systems",
+        "f5_preview": "consolidate project tracking",
+        
+        # efficiency metrics
+        "efficiency_planning": 7,
+        "efficiency_execution": 6,
+        "efficiency_review": 8,
+        "efficiency_communication": 5,
+        "workflow_bottlenecks": "meeting overload and context switching",
+        
+        # roi calculations
+        "base_overhead": 12.0,
+        "archetype_adjustment": 1.2,
+        "weekly_cost": 2400.0,
+        
+        # sensitivity analysis
+        "sensitivity_25_margin": 15.0,
+        "sensitivity_25_cost": 180000.0,
+        "sensitivity_25_hours": 4.0,
+        
+        "sensitivity_50_margin": 20.0,
+        "sensitivity_50_cost": 240000.0,
+        "sensitivity_50_hours": 6.0,
+        
+        "sensitivity_75_margin": 25.0,
+        "sensitivity_75_cost": 300000.0,
+        "sensitivity_75_hours": 8.0,
+        
+        # 5-year projections
+        "conservative_5yr": 450000.0,
+        "realistic_5yr": 600000.0,
+        "optimistic_5yr": 750000.0,
+        
+        # savings projections
+        "savings_month1": 5.0,
+        "savings_month3": 15.0,
+        "savings_month6": 25.0,
+        "savings_month12": 35.0,
+        
+        # implementation
+        "critical_path": "meeting optimization → async protocols → automation",
+        "milestone_schedule": "week 1-2: meetings, week 3-6: async, week 7-12: automation",
+        "roadmap_30_days": "implement structured meeting formats and async protocols",
+        "roadmap_60_days": "deploy automation tools and decision matrix",
+        "roadmap_90_days": "integrate systems and optimize workflows",
+        
+        # success metrics
+        "baseline_ontime": 65.0,
+        "target_ontime": 85.0,
+        "owner_ontime": "pm",
+        
+        "baseline_latency": 40.0,
+        "target_latency": 20.0,
+        "owner_latency": "cto",
+        
+        "baseline_variance": 25.0,
+        "target_variance": 10.0,
+        "owner_variance": "pm",
+        
+        "baseline_change": 15.0,
+        "target_change": 5.0,
+        "owner_change": "account",
+        
+        # next steps
+        "next_steps": "schedule implementation kickoff meeting and assign team leads",
     }
 
     # Use schema mapper to ensure all template fields are present
     normalized = to_report_fields(normalized)
-    
+
     # Validate normalized data
     if not validate_template_fields(normalized):
         raise ValueError("Template field validation failed")
