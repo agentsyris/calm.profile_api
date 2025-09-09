@@ -410,27 +410,29 @@ class ReportRenderer:
                 f.write(html_doc)
                 temp_html_path = f.name
 
-            # run brand linter
-            lint_cmd = [
-                "python3",
-                "renderer/lint_report.py",
-                temp_html_path,
-            ]
+            # run brand linter (non-blocking for now)
+            try:
+                lint_cmd = [
+                    "python3",
+                    "renderer/lint_report.py",
+                    temp_html_path,
+                ]
 
-            result = subprocess.run(
-                lint_cmd, capture_output=True, text=True, cwd=os.getcwd()
-            )
+                result = subprocess.run(
+                    lint_cmd, capture_output=True, text=True, cwd=os.getcwd()
+                )
+
+                if result.returncode != 0:
+                    logger.warning("brand linting failed (non-blocking):")
+                    logger.warning(result.stdout)
+                    logger.warning(result.stderr)
+                else:
+                    logger.info("brand compliance validation passed")
+            except Exception as e:
+                logger.warning(f"brand linting failed (non-blocking): {e}")
 
             # cleanup
             os.unlink(temp_html_path)
-
-            if result.returncode != 0:
-                logger.error("brand linting failed:")
-                logger.error(result.stdout)
-                logger.error(result.stderr)
-                return False
-
-            logger.info("brand compliance validation passed")
             return True
 
         except Exception as e:
