@@ -2,18 +2,18 @@
 
 ## executive summary
 
-**${company_name}** · **${assessment_date}** · **${report_id}**
+**{{ company_name | default('—') }}** · **{{ assessment_date | default('—') }}** · **{{ report_id | default('—') }}**
 
-${archetype_primary} archetype detected with ${archetype_confidence}% confidence.
+{{ archetype_primary | default('—') }} archetype detected with {{ archetype_confidence | default(0) }}% confidence.
 
 **headline roi:**
 
-- estimated productivity overhead: ${overhead_percentage}%
-- projected annual cost impact: ${annual_cost:,}
-- break-even timeline: ${break_even_timeline}
+- estimated productivity overhead: {{ overhead_percentage | default(0) }}%
+- projected annual cost impact: {{ fmt_currency(annual_cost | default(0)) }}
+- break-even timeline: {{ break_even_timeline | default('—') }}
 
 **top findings:**
-${top_findings}
+{{ top_findings | default('—') }}
 
 **methodology overview:**
 this assessment analyzes 20 behavioral indicators across six core axes: decision-making, collaboration, cadence, planning horizon, documentation, tooling posture. responses are mapped to established archetypes and calibrated against team context variables including meeting load, team size, and hourly rates.
@@ -31,7 +31,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 | artifacts reviewed | 14 briefs, 11 scopes, 9 estimates                                   |
 | scoring rubric     | 1–5 across speed/quality/predictability/efficiency/team health      |
 | limits             | self-report ±10%, seasonal skew (q4)                                |
-| roi assumptions    | team size ${team_size}, blended rates (see p8), adoption speed (p9) |
+| roi assumptions    | team size {{ team_size | default('—') }}, blended rates (see p8), adoption speed (p9) |
 
 **assessment methodology:**
 
@@ -63,7 +63,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 - **tooling posture**: comfort with technology adoption and digital workflows
 
 **profile insights:**
-${radar_insights}
+{{ radar_insights | default('—') }}
 
 **key patterns identified:**
 
@@ -80,11 +80,11 @@ ${radar_insights}
 
 | workflow | responsible | accountable | support | consulted | informed |
 | | -- | -- | -- | -- | -- |
-| intake | ${workflow1_r} | ${workflow1_a} | ${workflow1_s} | ${workflow1_c} | ${workflow1_i} |
-| scoping | ${workflow2_r} | ${workflow2_a} | ${workflow2_s} | ${workflow2_c} | ${workflow2_i} |
-| production | ${workflow3_r} | ${workflow3_a} | ${workflow3_s} | ${workflow3_c} | ${workflow3_i} |
-| qa | ${workflow4_r} | ${workflow4_a} | ${workflow4_s} | ${workflow4_c} | ${workflow4_i} |
-| delivery/invoicing | ${workflow5_r} | ${workflow5_a} | ${workflow5_s} | ${workflow5_c} | ${workflow5_i} |
+| intake | {{ workflow1_r | default('—') }} | {{ workflow1_a | default('—') }} | {{ workflow1_s | default('—') }} | {{ workflow1_c | default('—') }} | {{ workflow1_i | default('—') }} |
+| scoping | {{ workflow2_r | default('—') }} | {{ workflow2_a | default('—') }} | {{ workflow2_s | default('—') }} | {{ workflow2_c | default('—') }} | {{ workflow2_i | default('—') }} |
+| production | {{ workflow3_r | default('—') }} | {{ workflow3_a | default('—') }} | {{ workflow3_s | default('—') }} | {{ workflow3_c | default('—') }} | {{ workflow3_i | default('—') }} |
+| qa | {{ workflow4_r | default('—') }} | {{ workflow4_a | default('—') }} | {{ workflow4_s | default('—') }} | {{ workflow4_c | default('—') }} | {{ workflow4_i | default('—') }} |
+| delivery/invoicing | {{ workflow5_r | default('—') }} | {{ workflow5_a | default('—') }} | {{ workflow5_s | default('—') }} | {{ workflow5_c | default('—') }} | {{ workflow5_i | default('—') }} |
 
 ![handoff-flow](components/handoff-flow.svg)
 
@@ -92,49 +92,49 @@ ${radar_insights}
 
 ## findings
 
-### f1: ${f1_issue}
+### f1: {{ f1_issue | default('—') }}
 
-**evidence:** ${f1_evidence}  
-**impact:** ${f1_impact}  
-**root cause:** ${f1_root_cause}  
-**preview:** ${f1_preview}
+**evidence:** {{ f1_evidence | default('—') }}  
+**impact:** {{ f1_impact | default('—') }}  
+**root cause:** {{ f1_root_cause | default('—') }}  
+**preview:** {{ f1_preview | default('—') }}
 
-### f2: ${f2_issue}
+### f2: {{ f2_issue | default('—') }}
 
-**evidence:** ${f2_evidence}  
-**impact:** ${f2_impact}  
-**root cause:** ${f2_root_cause}  
-**preview:** ${f2_preview}
+**evidence:** {{ f2_evidence | default('—') }}  
+**impact:** {{ f2_impact | default('—') }}  
+**root cause:** {{ f2_root_cause | default('—') }}  
+**preview:** {{ f2_preview | default('—') }}
 
 ![workflow-heatmap](components/workflow-heatmap.svg)
 
 **process efficiency scores:**
 
-- planning: ${efficiency_planning}/10
-- execution: ${efficiency_execution}/10
-- review: ${efficiency_review}/10
-- communication: ${efficiency_communication}/10
+- planning: {{ efficiency_planning | default(0) }}/10
+- execution: {{ efficiency_execution | default(0) }}/10
+- review: {{ efficiency_review | default(0) }}/10
+- communication: {{ efficiency_communication | default(0) }}/10
 
 **bottleneck identification:**
-${workflow_bottlenecks}
+{{ workflow_bottlenecks | default('—') }}
 
 <div class="page-break"></div>
 
 ## findings (continued)
 
-### f3: ${f3_issue}
+### f3: {{ f3_issue | default('—') }}
 
-**evidence:** ${f3_evidence}  
-**impact:** ${f3_impact}  
-**root cause:** ${f3_root_cause}  
-**preview:** ${f3_preview}
+**evidence:** {{ f3_evidence | default('—') }}  
+**impact:** {{ f3_impact | default('—') }}  
+**root cause:** {{ f3_root_cause | default('—') }}  
+**preview:** {{ f3_preview | default('—') }}
 
-### f4: ${f4_issue}
+### f4: {{ f4_issue | default('—') }}
 
-**evidence:** ${f4_evidence}  
-**impact:** ${f4_impact}  
-**root cause:** ${f4_root_cause}  
-**preview:** ${f4_preview}
+**evidence:** {{ f4_evidence | default('—') }}  
+**impact:** {{ f4_impact | default('—') }}  
+**root cause:** {{ f4_root_cause | default('—') }}  
+**preview:** {{ f4_preview | default('—') }}
 
 ![swimlane](components/swimlane.svg)
 
@@ -142,12 +142,12 @@ ${workflow_bottlenecks}
 
 ## findings (continued)
 
-### f5: ${f5_issue}
+### f5: {{ f5_issue | default('—') }}
 
-**evidence:** ${f5_evidence}  
-**impact:** ${f5_impact}  
-**root cause:** ${f5_root_cause}  
-**preview:** ${f5_preview}
+**evidence:** {{ f5_evidence | default('—') }}  
+**impact:** {{ f5_impact | default('—') }}  
+**root cause:** {{ f5_root_cause | default('—') }}  
+**preview:** {{ f5_preview | default('—') }}
 
 ![integration-map](components/integration-map.svg)
 
@@ -155,11 +155,11 @@ ${workflow_bottlenecks}
 
 | finding | issue       | recommendation | solution    |
 | ------- | ----------- | -------------- | ----------- |
-| f1      | ${f1_issue} | r1             | ${r1_title} |
-| f2      | ${f2_issue} | r2             | ${r2_title} |
-| f3      | ${f3_issue} | r3             | ${r3_title} |
-| f4      | ${f4_issue} | r4             | ${r4_title} |
-| f5      | ${f5_issue} | r5             | ${r5_title} |
+| f1      | {{ f1_issue | default('—') }} | r1             | {{ r1_title | default('—') }} |
+| f2      | {{ f2_issue | default('—') }} | r2             | {{ r2_title | default('—') }} |
+| f3      | {{ f3_issue | default('—') }} | r3             | {{ r3_title | default('—') }} |
+| f4      | {{ f4_issue | default('—') }} | r4             | {{ r4_title | default('—') }} |
+| f5      | {{ f5_issue | default('—') }} | r5             | {{ r5_title | default('—') }} |
 
 <div class="page-break"></div>
 
@@ -167,25 +167,25 @@ ${workflow_bottlenecks}
 
 **current state costs:**
 
-- weekly productivity loss: ${hours_lost_ppw} hours
-- annual cost impact: ${annual_cost:,}
-- team multiplier effect: ${team_multiplier}x
+- weekly productivity loss: {{ hours_lost_ppw | default(0) }} hours
+- annual cost impact: {{ fmt_currency(annual_cost | default(0)) }}
+- team multiplier effect: {{ team_multiplier | default(1) }}x
 
 **projected savings:**
 
-- month 1: ${savings_month1}% improvement
-- month 3: ${savings_month3}% improvement
-- month 6: ${savings_month6}% improvement
-- month 12: ${savings_month12}% improvement
+- month 1: {{ savings_month1 | default(0) }}% improvement
+- month 3: {{ savings_month3 | default(0) }}% improvement
+- month 6: {{ savings_month6 | default(0) }}% improvement
+- month 12: {{ savings_month12 | default(0) }}% improvement
 
 **break-even timeline:**
-${break_even_timeline}
+{{ break_even_timeline | default('—') }}
 
 **roi formulas:**
 
-- base overhead: ${base_overhead}% adjusted to ${overhead_percentage}% given team factors (archetype: ${archetype_adjustment}, team multiplier: ${team_multiplier})
-- weekly cost: ${hours_lost_ppw} hours × ${hourly_rate} × ${team_multiplier} people = ${weekly_cost:,}
-- annual cost: ${weekly_cost:,} × 52 weeks = ${annual_cost:,}
+- base overhead: {{ base_overhead | default(0) }}% adjusted to {{ overhead_percentage | default(0) }}% given team factors (archetype: {{ archetype_adjustment | default(0) }}, team multiplier: {{ team_multiplier | default(1) }})
+- weekly cost: {{ hours_lost_ppw | default(0) }} hours × {{ hourly_rate | default(0) }} × {{ team_multiplier | default(1) }} people = {{ fmt_currency(weekly_cost | default(0)) }}
+- annual cost: {{ fmt_currency(weekly_cost | default(0)) }} × 52 weeks = {{ fmt_currency(annual_cost | default(0)) }}
 
 **blended rates:** account $95 / pm $85 / creative $125 / ops $80  
 **line items:** meetings, review latency, duplicate entry, rework, estimate variance, write-offs  
@@ -201,17 +201,17 @@ ${break_even_timeline}
 
 | implementation success | margin (pp) | $/q | hours released/q |
 | - | | | -- |
-| 25% | ${sensitivity_25_margin} pp | ${sensitivity_25_cost:,} | ${sensitivity_25_hours} |
-| 50% | ${sensitivity_50_margin} pp | ${sensitivity_50_cost:,} | ${sensitivity_50_hours} |
-| 75% | ${sensitivity_75_margin} pp | ${sensitivity_75_cost:,} | ${sensitivity_75_hours} |
+| 25% | {{ sensitivity_25_margin | default(0) }} pp | {{ fmt_currency(sensitivity_25_cost | default(0)) }} | {{ sensitivity_25_hours | default(0) }} |
+| 50% | {{ sensitivity_50_margin | default(0) }} pp | {{ fmt_currency(sensitivity_50_cost | default(0)) }} | {{ sensitivity_50_hours | default(0) }} |
+| 75% | {{ sensitivity_75_margin | default(0) }} pp | {{ fmt_currency(sensitivity_75_cost | default(0)) }} | {{ sensitivity_75_hours | default(0) }} |
 
 **adoption scenarios:**
 
 | scenario | team adoption | timeline | 5-yr savings |
 | | - | -- | |
-| conservative | 25% | 6 months | ${conservative_5yr:,} |
-| realistic | 50% | 4 months | ${realistic_5yr:,} |
-| optimistic | 75% | 3 months | ${optimistic_5yr:,} |
+| conservative | 25% | 6 months | {{ fmt_currency(conservative_5yr | default(0)) }} |
+| realistic | 50% | 4 months | {{ fmt_currency(realistic_5yr | default(0)) }} |
+| optimistic | 75% | 3 months | {{ fmt_currency(optimistic_5yr | default(0)) }} |
 
 ![5-year cumulative savings](components/savings-line-5yr.svg)
 
@@ -219,57 +219,57 @@ ${break_even_timeline}
 
 ## recommendations
 
-### r1: ${r1_title}
+### r1: {{ r1_title | default('—') }}
 
-**linked to:** f${r1_linked_finding}  
-**description:** ${r1_description}  
-**impact:** ${r1_impact}  
-**effort:** ${r1_effort}  
-**rice score:** ${r1_rice}
+**linked to:** f{{ r1_linked_finding | default('—') }}  
+**description:** {{ r1_description | default('—') }}  
+**impact:** {{ r1_impact | default('—') }}  
+**effort:** {{ r1_effort | default('—') }}  
+**rice score:** {{ r1_rice | default(0) }}
 
-### r2: ${r2_title}
+### r2: {{ r2_title | default('—') }}
 
-**linked to:** f${r2_linked_finding}  
-**description:** ${r2_description}  
-**impact:** ${r2_impact}  
-**effort:** ${r2_effort}  
-**rice score:** ${r2_rice}
+**linked to:** f{{ r2_linked_finding | default('—') }}  
+**description:** {{ r2_description | default('—') }}  
+**impact:** {{ r2_impact | default('—') }}  
+**effort:** {{ r2_effort | default('—') }}  
+**rice score:** {{ r2_rice | default(0) }}
 
-### r3: ${r3_title}
+### r3: {{ r3_title | default('—') }}
 
-**linked to:** f${r3_linked_finding}  
-**description:** ${r3_description}  
-**impact:** ${r3_impact}  
-**effort:** ${r3_effort}  
-**rice score:** ${r3_rice}
+**linked to:** f{{ r3_linked_finding | default('—') }}  
+**description:** {{ r3_description | default('—') }}  
+**impact:** {{ r3_impact | default('—') }}  
+**effort:** {{ r3_effort | default('—') }}  
+**rice score:** {{ r3_rice | default(0) }}
 
 <div class="page-break"></div>
 
 ## recommendations (continued)
 
-### r4: ${r4_title}
+### r4: {{ r4_title | default('—') }}
 
-**linked to:** f${r4_linked_finding}  
-**description:** ${r4_description}  
-**impact:** ${r4_impact}  
-**effort:** ${r4_effort}  
-**rice score:** ${r4_rice}
+**linked to:** f{{ r4_linked_finding | default('—') }}  
+**description:** {{ r4_description | default('—') }}  
+**impact:** {{ r4_impact | default('—') }}  
+**effort:** {{ r4_effort | default('—') }}  
+**rice score:** {{ r4_rice | default(0) }}
 
-### r5: ${r5_title}
+### r5: {{ r5_title | default('—') }}
 
-**linked to:** f${r5_linked_finding}  
-**description:** ${r5_description}  
-**impact:** ${r5_impact}  
-**effort:** ${r5_effort}  
-**rice score:** ${r5_rice}
+**linked to:** f{{ r5_linked_finding | default('—') }}  
+**description:** {{ r5_description | default('—') }}  
+**impact:** {{ r5_impact | default('—') }}  
+**effort:** {{ r5_effort | default('—') }}  
+**rice score:** {{ r5_rice | default(0) }}
 
 ![impact matrix](components/impact-matrix.svg)
 
 **critical path:**
-${critical_path}
+{{ critical_path | default('—') }}
 
 **milestone schedule:**
-${milestone_schedule}
+{{ milestone_schedule | default('—') }}
 
 <div class="page-break"></div>
 
@@ -278,24 +278,24 @@ ${milestone_schedule}
 ![mini-gantt](components/mini-gantt.svg)
 
 **30-day quick wins:**
-${roadmap_30_days}
+{{ roadmap_30_days | default('—') }}
 
 **60-day foundations:**
-${roadmap_60_days}
+{{ roadmap_60_days | default('—') }}
 
 **90-day optimization:**
-${roadmap_90_days}
+{{ roadmap_90_days | default('—') }}
 
 **success kpis:**
 
 | metric | baseline | target | owner |
 | -- | -- | | -- |
-| on-time delivery | ${baseline_ontime}% | ${target_ontime}% | ${owner_ontime} |
-| latency reduction | ${baseline_latency}% | ${target_latency}% | ${owner_latency} |
-| estimate variance | ${baseline_variance} pp | ${target_variance} pp | ${owner_variance} |
-| change-order capture | ${baseline_change}% | ${target_change}% | ${owner_change} |
+| on-time delivery | {{ baseline_ontime | default(0) }}% | {{ target_ontime | default(0) }}% | {{ owner_ontime | default('—') }} |
+| latency reduction | {{ baseline_latency | default(0) }}% | {{ target_latency | default(0) }}% | {{ owner_latency | default('—') }} |
+| estimate variance | {{ baseline_variance | default(0) }} pp | {{ target_variance | default(0) }} pp | {{ owner_variance | default('—') }} |
+| change-order capture | {{ baseline_change | default(0) }}% | {{ target_change | default(0) }}% | {{ owner_change | default('—') }} |
 
 **next steps:**
-${next_steps}
+{{ next_steps | default('—') }}
 
 _appendix (tool audit, survey cuts, rasic drafts, raw tables) is provided off-doc via qr/link to a shared folder._
