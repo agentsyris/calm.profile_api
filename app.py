@@ -197,7 +197,8 @@ def _json(data, status=200):
 
 def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
     """validate required fields and normalize data for template rendering"""
-
+    from renderer.schema import to_report_fields, validate_template_fields
+    
     # required fields that must exist
     required_fields = [
         "responses",
@@ -229,6 +230,7 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         "assessment_id": raw_data.get("assessment_id", "unknown"),
         "completion_date": raw_data.get("completion_date", "unknown"),
         "customer_email": raw_data.get("customer_email", "unknown"),
+        
         # archetype data
         "archetype_primary": result.get("archetype", {}).get("primary", "unknown"),
         "archetype_confidence": result.get("archetype", {}).get("confidence", 0),
@@ -320,26 +322,12 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         "time_context_switch": 10,
     }
 
-    # validate normalized data has no missing placeholders
-    template_placeholders = [
-        "company_name",
-        "assessment_date",
-        "report_id",
-        "archetype_primary",
-        "archetype_confidence",
-        "overhead_percentage",
-        "annual_cost",
-        "break_even_timeline",
-        "r1_rice",
-        "r2_rice",
-        "r3_rice",
-        "r4_rice",
-        "r5_rice",
-    ]
-
-    missing_placeholders = [p for p in template_placeholders if p not in normalized]
-    if missing_placeholders:
-        raise ValueError(f"Missing template placeholders: {missing_placeholders}")
+    # Use schema mapper to ensure all template fields are present
+    normalized = to_report_fields(normalized)
+    
+    # Validate normalized data
+    if not validate_template_fields(normalized):
+        raise ValueError("Template field validation failed")
 
     app.logger.info(f"Normalized data validation passed. Keys: {len(normalized)}")
     return normalized
@@ -352,7 +340,7 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(assessment_data, f)
             temp_json_path = f.name
-        
+
         app.logger.info(f"Created temp data file: {temp_json_path}")
         app.logger.info(f"Data file size: {os.path.getsize(temp_json_path)} bytes")
 
