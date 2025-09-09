@@ -221,7 +221,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 
 ### r1: {{ r1_title | default('—') }}
 
-**linked to:** f{{ r1_linked_finding | default('—') }}  
+**linked to:** {{ r1_linked_finding | default('—') }}  
 **description:** {{ r1_description | default('—') }}  
 **impact:** {{ r1_impact | default('—') }}  
 **effort:** {{ r1_effort | default('—') }}  
@@ -229,7 +229,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 
 ### r2: {{ r2_title | default('—') }}
 
-**linked to:** f{{ r2_linked_finding | default('—') }}  
+**linked to:** {{ r2_linked_finding | default('—') }}  
 **description:** {{ r2_description | default('—') }}  
 **impact:** {{ r2_impact | default('—') }}  
 **effort:** {{ r2_effort | default('—') }}  
@@ -237,7 +237,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 
 ### r3: {{ r3_title | default('—') }}
 
-**linked to:** f{{ r3_linked_finding | default('—') }}  
+**linked to:** {{ r3_linked_finding | default('—') }}  
 **description:** {{ r3_description | default('—') }}  
 **impact:** {{ r3_impact | default('—') }}  
 **effort:** {{ r3_effort | default('—') }}  
@@ -249,7 +249,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 
 ### r4: {{ r4_title | default('—') }}
 
-**linked to:** f{{ r4_linked_finding | default('—') }}  
+**linked to:** {{ r4_linked_finding | default('—') }}  
 **description:** {{ r4_description | default('—') }}  
 **impact:** {{ r4_impact | default('—') }}  
 **effort:** {{ r4_effort | default('—') }}  
@@ -257,7 +257,7 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 
 ### r5: {{ r5_title | default('—') }}
 
-**linked to:** f{{ r5_linked_finding | default('—') }}  
+**linked to:** {{ r5_linked_finding | default('—') }}  
 **description:** {{ r5_description | default('—') }}  
 **impact:** {{ r5_impact | default('—') }}  
 **effort:** {{ r5_effort | default('—') }}  
