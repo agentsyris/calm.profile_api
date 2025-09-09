@@ -208,9 +208,26 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         pdf_filename = f"calm_profile_report_{customer_email}_{timestamp}.pdf"
 
         # run renderer subprocess
+        # Try multiple possible paths for the renderer script
+        possible_paths = [
+            "renderer/render_report.py",
+            os.path.join(os.getcwd(), "renderer", "render_report.py"),
+            os.path.join(os.path.dirname(__file__), "renderer", "render_report.py"),
+            "/opt/render/project/src/renderer/render_report.py"
+        ]
+        
+        renderer_script = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                renderer_script = path
+                break
+        
+        if not renderer_script:
+            raise Exception(f"Could not find renderer script. Tried: {possible_paths}")
+        
         renderer_cmd = [
             "python3",
-            os.path.join(os.getcwd(), "renderer", "render_report.py"),
+            renderer_script,
             "--data",
             temp_json_path,
             "--output",
