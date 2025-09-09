@@ -46,15 +46,25 @@ try:
 except ImportError:
     MARKDOWN_AVAILABLE = False
 
+try:
+    from jinja2 import Environment, FileSystemLoader, StrictUndefined
+
+    JINJA2_AVAILABLE = True
+except ImportError:
+    JINJA2_AVAILABLE = False
+
 # setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class ReportRenderer:
-    """renders calm.profile reports from template and data"""
+    """renders calm.profile reports from jinja2 template and data"""
 
     def __init__(self, templates_dir: str = "templates"):
+        if not JINJA2_AVAILABLE:
+            raise ImportError("jinja2 not available. install with: pip install jinja2")
+            
         self.templates_dir = Path(templates_dir)
         self.template_file = self.templates_dir / "calm_profile_report_template.md"
         self.css_file = self.templates_dir / "report.css"
@@ -63,72 +73,37 @@ class ReportRenderer:
             raise FileNotFoundError(f"template not found: {self.template_file}")
         if not self.css_file.exists():
             raise FileNotFoundError(f"css not found: {self.css_file}")
-
-    def load_template(self) -> str:
-        """load markdown template"""
-        return self.template_file.read_text(encoding="utf-8")
+            
+        # setup jinja2 environment with strict undefined
+        self.jinja_env = Environment(
+            loader=FileSystemLoader(str(self.templates_dir)),
+            undefined=StrictUndefined,
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
 
     def load_css(self) -> str:
         """load css styles"""
         return self.css_file.read_text(encoding="utf-8")
 
-    def substitute_placeholders(self, template: str, data: Dict[str, Any]) -> str:
-        """replace ${var} placeholders with actual data"""
+    def render_template(self, data: Dict[str, Any]) -> str:
+        """render jinja2 template with data - raises error if key missing"""
+        try:
+            template = self.jinja_env.get_template("calm_profile_report_template.md")
+            
+            # add formatting functions to template context
+            template_data = {
+                **data,
+                'fmt_int': fmt_int,
+                'fmt_currency': fmt_currency,
+                'fmt_percent': fmt_percent,
+            }
+            
+            return template.render(**template_data)
+        except Exception as e:
+            logger.error(f"Template rendering failed: {e}")
+            raise ValueError(f"Template rendering failed: {e}")
 
-        def replace_placeholder(match):
-            key_with_format = match.group(1)
-            # extract the base key (remove formatting like :,)
-            key = key_with_format.split(":")[0]
-            value = data.get(key)
-
-            # hard-fail on missing required placeholders
-            if value is None:
-                raise ValueError(f"Missing required template placeholder: ${key}")
-
-            # handle special formatting using utilities
-            if isinstance(value, (int, float)):
-                if (
-                    "cost" in key.lower()
-                    or "savings" in key.lower()
-                    or "rate" in key.lower()
-                    or "5yr"
-                    in key.lower()  # 5-year savings should be formatted as currency
-                ):
-                    return fmt_currency(value)
-                elif "percentage" in key.lower() or "confidence" in key.lower():
-                    return fmt_percent(value, 1)
-                elif "margin" in key.lower():
-                    return fmt_int(value)  # margin fields should not have % symbol
-                elif "hours" in key.lower() or "count" in key.lower():
-                    return fmt_int(value)
-                elif "rice" in key.lower():
-                    # rice scores - compute if missing or return placeholder
-                    if value == f"${key}":
-                        return "TBD"  # fallback for missing rice scores
-                    return str(value)
-                else:
-                    return fmt_int(value)
-            elif isinstance(value, list):
-                if key == "top_findings":
-                    # convert top findings array to bullet list
-                    return f"<ul>{''.join(f'<li>{str(v)}</li>' for v in value)}</ul>"
-                else:
-                    return ", ".join(str(v) for v in value)
-            else:
-                return str(value)
-
-        result = re.sub(r"\$\{([^}]+)\}", replace_placeholder, template)
-
-        # verify all placeholders resolved - fail if any remain
-        unresolved = re.findall(r"\$\{[^}]+\}", result)
-        if unresolved:
-            raise ValueError(f"unresolved placeholders found: {unresolved}")
-
-        # fix percentage formatting issues
-        result = re.sub(r"\$(\d+(?:\.\d+)?%)", r"\1", result)  # $5% → 5%
-        result = re.sub(r"(\d+(?:\.\d+)?)%%", r"\1%", result)  # 87.5%% → 87.5%
-
-        return result
 
     def inject_image_paths(self, content: str) -> str:
         """inject proper image paths for components"""
@@ -452,12 +427,8 @@ class ReportRenderer:
                 "weasyprint not available. install with: pip install weasyprint"
             )
 
-        # load template and css
-        template = self.load_template()
-        css = self.load_css()
-
-        # substitute placeholders
-        content = self.substitute_placeholders(template, data)
+        # render template with jinja2 (raises error if key missing)
+        content = self.render_template(data)
 
         # inject image paths
         content = self.inject_image_paths(content)
@@ -466,7 +437,7 @@ class ReportRenderer:
         html_content = self.markdown_to_html(content)
 
         # create complete document
-        html_doc = self.create_html_document(html_content, css)
+        html_doc = self.create_html_document(html_content, self.load_css())
 
         # validate page count
         if not self.validate_page_count(html_doc):
@@ -496,14 +467,10 @@ class ReportRenderer:
     def render_to_html(
         self, data: Dict[str, Any], output_path: Optional[str] = None
     ) -> str:
-        """render report to html"""
-        # load template and css
-        template = self.load_template()
-        css = self.load_css()
-
-        # substitute placeholders
-        content = self.substitute_placeholders(template, data)
-
+        """render report to html using jinja2"""
+        # render template with jinja2 (raises error if key missing)
+        content = self.render_template(data)
+        
         # inject image paths
         content = self.inject_image_paths(content)
 
@@ -511,7 +478,7 @@ class ReportRenderer:
         html_content = self.markdown_to_html(content)
 
         # create complete document
-        html_doc = self.create_html_document(html_content, css)
+        html_doc = self.create_html_document(html_content, self.load_css())
 
         # create output directory
         output_dir = Path("out")
