@@ -141,6 +141,7 @@ app.secret_key = SECRET_KEY
 
 # Configure logging
 import logging
+
 logging.basicConfig(level=logging.INFO)
 app.logger.setLevel(logging.INFO)
 
@@ -209,7 +210,7 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         # run renderer subprocess
         renderer_cmd = [
             "python3",
-            "renderer/render_report.py",
+            os.path.join(os.getcwd(), "renderer", "render_report.py"),
             "--data",
             temp_json_path,
             "--output",
