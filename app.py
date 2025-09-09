@@ -139,6 +139,11 @@ Base.metadata.create_all(engine)
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
+# Configure logging
+import logging
+logging.basicConfig(level=logging.INFO)
+app.logger.setLevel(logging.INFO)
+
 # FIXED CORS CONFIGURATION
 CORS(
     app,
