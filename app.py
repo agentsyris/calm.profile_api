@@ -375,7 +375,7 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
         download_link = f'<p><a href="{pdf_url}" style="color: #00c9a7; text-decoration: none; font-weight: 500;">download report (pdf)</a></p>'
 
     data = {
-        "From": "reports@syris.studio",
+        "From": "agent@syris.studio",
         "To": customer_email,
         "Subject": "your calm.profile diagnostic report",
         "HtmlBody": f"""
@@ -434,10 +434,12 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
     response = requests.post(
         "https://api.postmarkapp.com/email", headers=headers, json=data
     )
-    
+
     if response.status_code != 200:
-        app.logger.error(f"Postmark API error: {response.status_code} - {response.text}")
-    
+        app.logger.error(
+            f"Postmark API error: {response.status_code} - {response.text}"
+        )
+
     return response.status_code == 200
 
 
