@@ -857,6 +857,10 @@ def api_stripe_webhook():
                 }
             )
 
+            # debug: log assessment data structure
+            app.logger.info(f"Assessment data keys: {list(assessment_data.keys())}")
+            app.logger.info(f"Assessment data sample: {str(assessment_data)[:500]}...")
+            
             # generate pdf and get s3 url
             pdf_url = generate_pdf_report(assessment_data, customer_email)
 
