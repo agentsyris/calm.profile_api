@@ -9,6 +9,7 @@ from pathlib import Path
 # Optional AWS S3 import
 try:
     import boto3
+
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
@@ -222,7 +223,12 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
             raise Exception("pdf file not generated")
 
         # try s3 upload first, fallback to local storage
-        if AWS_S3_BUCKET and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and BOTO3_AVAILABLE:
+        if (
+            AWS_S3_BUCKET
+            and AWS_ACCESS_KEY_ID
+            and AWS_SECRET_ACCESS_KEY
+            and BOTO3_AVAILABLE
+        ):
             try:
                 s3_url = upload_to_s3(str(pdf_path), pdf_filename)
                 # cleanup
@@ -248,7 +254,7 @@ def upload_to_s3(file_path: str, filename: str) -> str:
     """upload file to s3 and return signed url"""
     if not BOTO3_AVAILABLE:
         raise ImportError("boto3 not available")
-    
+
     try:
         s3_client = boto3.client(
             "s3",
