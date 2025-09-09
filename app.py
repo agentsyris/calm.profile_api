@@ -449,6 +449,7 @@ def root():
 
 @app.get("/health")
 def health():
+    app.logger.info("Health check requested")
     return _json({"ok": True, "time": datetime.utcnow().isoformat() + "Z"})
 
 
@@ -467,7 +468,9 @@ def db_check():
 
 @app.post("/api/assess")
 def assess():
+    app.logger.info("Assessment submission received")
     if not score_assessment:
+        app.logger.error("Scoring module not available")
         return _json(
             {"success": False, "error": "scoring module not available"}, status=500
         )
