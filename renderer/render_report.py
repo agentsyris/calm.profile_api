@@ -19,17 +19,37 @@ from typing import Dict, Any, Optional
 # number formatting utilities
 def fmt_int(x):
     """format integer with commas"""
-    return f"{int(round(x)):,}"
+    if x is None:
+        return "0"
+    return f"{int(round(float(x))):,}"
 
 
 def fmt_currency(x):
     """format currency with commas"""
-    return f"${int(round(x)):,}"
+    if x is None:
+        return "$0"
+    return f"${int(round(float(x))):,}"
 
 
 def fmt_percent(x, digits=0):
     """format percentage with specified decimal places"""
-    return f"{x:.{digits}f}%"
+    if x is None:
+        return "0%"
+    return f"{float(x):.{digits}f}%"
+
+
+def fmt_hours(x):
+    """format hours with 1 decimal place"""
+    if x is None:
+        return "0.0"
+    return f"{float(x):.1f}"
+
+
+def fmt_round(x, digits=0):
+    """format number with specified decimal places"""
+    if x is None:
+        return "0"
+    return f"{float(x):.{digits}f}"
 
 
 try:
@@ -64,7 +84,7 @@ class ReportRenderer:
     def __init__(self, templates_dir: str = "templates"):
         if not JINJA2_AVAILABLE:
             raise ImportError("jinja2 not available. install with: pip install jinja2")
-            
+
         self.templates_dir = Path(templates_dir)
         self.template_file = self.templates_dir / "calm_profile_report_template.md"
         self.css_file = self.templates_dir / "report.css"
@@ -73,13 +93,13 @@ class ReportRenderer:
             raise FileNotFoundError(f"template not found: {self.template_file}")
         if not self.css_file.exists():
             raise FileNotFoundError(f"css not found: {self.css_file}")
-            
+
         # setup jinja2 environment with strict undefined
         self.jinja_env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
             undefined=StrictUndefined,
             trim_blocks=True,
-            lstrip_blocks=True
+            lstrip_blocks=True,
         )
 
     def load_css(self) -> str:
@@ -90,20 +110,21 @@ class ReportRenderer:
         """render jinja2 template with data - raises error if key missing"""
         try:
             template = self.jinja_env.get_template("calm_profile_report_template.md")
-            
+
             # add formatting functions to template context
             template_data = {
                 **data,
-                'fmt_int': fmt_int,
-                'fmt_currency': fmt_currency,
-                'fmt_percent': fmt_percent,
+                "fmt_int": fmt_int,
+                "fmt_currency": fmt_currency,
+                "fmt_percent": fmt_percent,
+                "fmt_hours": fmt_hours,
+                "fmt_round": fmt_round,
             }
-            
+
             return template.render(**template_data)
         except Exception as e:
             logger.error(f"Template rendering failed: {e}")
             raise ValueError(f"Template rendering failed: {e}")
-
 
     def inject_image_paths(self, content: str) -> str:
         """inject proper image paths for components"""
@@ -470,7 +491,7 @@ class ReportRenderer:
         """render report to html using jinja2"""
         # render template with jinja2 (raises error if key missing)
         content = self.render_template(data)
-        
+
         # inject image paths
         content = self.inject_image_paths(content)
 
