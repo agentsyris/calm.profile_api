@@ -208,15 +208,29 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         pdf_filename = f"calm_profile_report_{customer_email}_{timestamp}.pdf"
 
         # run renderer subprocess
-        # Use the correct path for Render deployment
-        renderer_script = "/opt/render/project/src/renderer/render_report.py"
+        # Debug: check what's actually available
+        app.logger.info(f"Current working directory: {os.getcwd()}")
+        app.logger.info(f"Directory contents: {os.listdir('.')}")
         
-        # Verify the script exists
-        if not os.path.exists(renderer_script):
-            # Fallback to relative path
-            renderer_script = "renderer/render_report.py"
-            if not os.path.exists(renderer_script):
-                raise Exception(f"Could not find renderer script at {renderer_script}")
+        # Try different possible paths
+        possible_paths = [
+            "/opt/render/project/src/renderer/render_report.py",
+            "/opt/render/project/renderer/render_report.py", 
+            "/opt/render/renderer/render_report.py",
+            "renderer/render_report.py",
+            "./renderer/render_report.py",
+            os.path.join(os.getcwd(), "renderer", "render_report.py")
+        ]
+        
+        renderer_script = None
+        for path in possible_paths:
+            app.logger.info(f"Checking: {path} - exists: {os.path.exists(path)}")
+            if os.path.exists(path):
+                renderer_script = path
+                break
+        
+        if not renderer_script:
+            raise Exception(f"Could not find renderer script. Tried: {possible_paths}")
         
         app.logger.info(f"Using renderer script: {renderer_script}")
 
