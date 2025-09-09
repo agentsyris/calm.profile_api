@@ -208,33 +208,17 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
         pdf_filename = f"calm_profile_report_{customer_email}_{timestamp}.pdf"
 
         # run renderer subprocess
-        # Debug: log current working directory and file structure
-        app.logger.info(f"Current working directory: {os.getcwd()}")
-        app.logger.info(f"__file__ location: {__file__}")
-        app.logger.info(f"Directory contents: {os.listdir('.')}")
-        if os.path.exists('renderer'):
-            app.logger.info(f"Renderer directory contents: {os.listdir('renderer')}")
+        # Use the correct path for Render deployment
+        renderer_script = "/opt/render/project/src/renderer/render_report.py"
         
-        # Try multiple possible paths for the renderer script
-        possible_paths = [
-            "renderer/render_report.py",
-            os.path.join(os.getcwd(), "renderer", "render_report.py"),
-            os.path.join(os.path.dirname(__file__), "renderer", "render_report.py"),
-            "/opt/render/project/src/renderer/render_report.py",
-        ]
-
-        app.logger.info(f"Trying paths: {possible_paths}")
+        # Verify the script exists
+        if not os.path.exists(renderer_script):
+            # Fallback to relative path
+            renderer_script = "renderer/render_report.py"
+            if not os.path.exists(renderer_script):
+                raise Exception(f"Could not find renderer script at {renderer_script}")
         
-        renderer_script = None
-        for path in possible_paths:
-            app.logger.info(f"Checking path: {path} - exists: {os.path.exists(path)}")
-            if os.path.exists(path):
-                renderer_script = path
-                app.logger.info(f"Found renderer script at: {path}")
-                break
-
-        if not renderer_script:
-            raise Exception(f"Could not find renderer script. Tried: {possible_paths}")
+        app.logger.info(f"Using renderer script: {renderer_script}")
 
         renderer_cmd = [
             "python3",
