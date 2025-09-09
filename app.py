@@ -1,7 +1,11 @@
 import os
 import json
+import subprocess
+import tempfile
+import boto3
 from datetime import datetime
 from typing import Optional
+from pathlib import Path
 
 from flask import Flask, request, jsonify, g
 from flask_cors import CORS
@@ -50,8 +54,19 @@ if not STRIPE_SECRET_KEY:
 
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 PRICE_ID = os.environ.get("PRICE_ID", "")
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://calmprofile.vercel.app")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://syris.studio")
 SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24).hex())
+
+# PDF generation and storage config
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "")
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
+
+# Email service config
+POSTMARK_API_TOKEN = os.environ.get("POSTMARK_API_TOKEN", "")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+CALENDLY_URL = os.environ.get("CALENDLY_URL", "https://calendly.com/syris-studio")
 
 stripe.api_key = STRIPE_SECRET_KEY
 
@@ -123,9 +138,14 @@ CORS(
     origins=[
         "https://calmprofile.vercel.app",
         "https://*.vercel.app",
+        "https://syris.studio",
+        "https://*.syris.studio",
         "http://localhost:5173",
         "http://localhost:3000",
         "http://localhost:5000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5000",
     ],
     allow_headers=["Content-Type", "Authorization"],
     methods=["GET", "POST", "OPTIONS"],
@@ -155,11 +175,264 @@ def _frontend_base() -> str:
         return origin
     if FRONTEND_URL:
         return FRONTEND_URL
-    return "https://calmprofile.vercel.app"
+    return "https://syris.studio"
 
 
 def _json(data, status=200):
     return jsonify(data), status
+
+
+def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
+    """generate pdf report and return url (s3 or local)"""
+    try:
+        # create temporary json file with assessment data
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(assessment_data, f)
+            temp_json_path = f.name
+
+        # generate pdf using renderer
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pdf_filename = f"calm_profile_report_{customer_email}_{timestamp}.pdf"
+
+        # run renderer subprocess
+        renderer_cmd = [
+            "python3",
+            "renderer/render_report.py",
+            "--data",
+            temp_json_path,
+            "--output",
+            pdf_filename,
+        ]
+
+        result = subprocess.run(
+            renderer_cmd, capture_output=True, text=True, cwd=os.getcwd()
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"renderer failed: {result.stderr}")
+
+        pdf_path = Path("out") / pdf_filename
+        if not pdf_path.exists():
+            raise Exception("pdf file not generated")
+
+        # try s3 upload first, fallback to local storage
+        if AWS_S3_BUCKET and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+            try:
+                s3_url = upload_to_s3(str(pdf_path), pdf_filename)
+                # cleanup
+                os.unlink(temp_json_path)
+                pdf_path.unlink()
+                return s3_url
+            except Exception as e:
+                app.logger.warning(f"s3 upload failed, using local storage: {e}")
+        
+        # fallback: keep file locally and return local path
+        # cleanup temp json but keep pdf
+        os.unlink(temp_json_path)
+        
+        # return local file path (in production, you'd want to serve this via your app)
+        return f"local://{pdf_path}"
+
+    except Exception as e:
+        app.logger.error(f"pdf generation failed: {str(e)}")
+        raise
+
+
+def upload_to_s3(file_path: str, filename: str) -> str:
+    """upload file to s3 and return signed url"""
+    try:
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            region_name=AWS_REGION,
+        )
+
+        # upload file
+        s3_key = f"reports/{filename}"
+        s3_client.upload_file(file_path, AWS_S3_BUCKET, s3_key)
+
+        # generate signed url (valid for 7 days)
+        signed_url = s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": AWS_S3_BUCKET, "Key": s3_key},
+            ExpiresIn=604800,  # 7 days
+        )
+
+        return signed_url
+
+    except Exception as e:
+        app.logger.error(f"s3 upload failed: {str(e)}")
+        raise
+
+
+def send_report_email(
+    customer_email: str, pdf_url: str, company_name: str = "your organization"
+) -> bool:
+    """send transactional email with pdf link or attachment"""
+    try:
+        # try postmark first, fallback to resend
+        if POSTMARK_API_TOKEN:
+            return send_postmark_email(customer_email, pdf_url, company_name)
+        elif RESEND_API_KEY:
+            return send_resend_email(customer_email, pdf_url, company_name)
+        else:
+            app.logger.warning("no email service configured")
+            return False
+
+    except Exception as e:
+        app.logger.error(f"email sending failed: {str(e)}")
+        return False
+
+
+def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) -> bool:
+    """send email via postmark with pdf link or attachment"""
+    import requests
+    import base64
+
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-Postmark-Server-Token": POSTMARK_API_TOKEN,
+    }
+
+    # handle local files vs s3 urls
+    if pdf_url.startswith("local://"):
+        # for local files, we'll attach the PDF
+        pdf_path = pdf_url.replace("local://", "")
+        try:
+            with open(pdf_path, "rb") as f:
+                pdf_content = base64.b64encode(f.read()).decode('utf-8')
+            
+            attachments = [{
+                "Name": "calm_profile_report.pdf",
+                "Content": pdf_content,
+                "ContentType": "application/pdf"
+            }]
+            
+            download_text = "your personalized diagnostic report is attached to this email."
+            download_link = ""
+        except Exception as e:
+            app.logger.error(f"failed to read local pdf: {e}")
+            attachments = []
+            download_text = "your personalized diagnostic report is ready, but there was an issue with the file."
+            download_link = ""
+    else:
+        # s3 url - use download link
+        attachments = []
+        download_text = "your personalized diagnostic report is ready for download:"
+        download_link = f'<p><a href="{pdf_url}" style="color: #00c9a7; text-decoration: none; font-weight: 500;">download report (pdf)</a></p>'
+
+    data = {
+        "From": "reports@syris.studio",
+        "To": customer_email,
+        "Subject": "your calm.profile diagnostic report",
+        "HtmlBody": f"""
+        <html>
+        <body style="font-family: 'JetBrains Mono', monospace; color: #0a0a0a;">
+            <h2 style="font-family: 'Inter', sans-serif; text-transform: lowercase;">your calm.profile diagnostic report</h2>
+            
+            <p>thank you for completing the calm.profile assessment for <strong>{company_name}</strong>.</p>
+            
+            <p>{download_text}</p>
+            
+            {download_link}
+            
+            <p>the report includes:</p>
+            <ul>
+                <li>behavioral archetype analysis</li>
+                <li>productivity overhead assessment</li>
+                <li>roi projections and sensitivity analysis</li>
+                <li>prioritized recommendations</li>
+                <li>30/60/90 implementation roadmap</li>
+            </ul>
+            
+            <p>questions about your results? <a href="{CALENDLY_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
+            
+            <p style="margin-top: 32px; font-size: 12px; color: #666666;">
+                syrıs<span style="color: #00c9a7;">.</span> — calm in the chaos of creative work
+            </p>
+        </body>
+        </html>
+        """,
+        "TextBody": f"""
+        your calm.profile diagnostic report
+        
+        thank you for completing the calm.profile assessment for {company_name}.
+        
+        {download_text}
+        {pdf_url if not pdf_url.startswith("local://") else "Report attached to this email."}
+        
+        the report includes:
+        - behavioral archetype analysis
+        - productivity overhead assessment  
+        - roi projections and sensitivity analysis
+        - prioritized recommendations
+        - 30/60/90 implementation roadmap
+        
+        questions about your results? schedule a consultation: {CALENDLY_URL}
+        
+        syrıs. — calm in the chaos of creative work
+        """,
+    }
+    
+    # add attachments if we have them
+    if attachments:
+        data["Attachments"] = attachments
+
+    response = requests.post(
+        "https://api.postmarkapp.com/email", headers=headers, json=data
+    )
+    return response.status_code == 200
+
+
+def send_resend_email(customer_email: str, pdf_url: str, company_name: str) -> bool:
+    """send email via resend"""
+    import requests
+
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "from": "reports@syris.studio",
+        "to": [customer_email],
+        "subject": "your calm.profile diagnostic report",
+        "html": f"""
+        <html>
+        <body style="font-family: 'JetBrains Mono', monospace; color: #0a0a0a;">
+            <h2 style="font-family: 'Inter', sans-serif; text-transform: lowercase;">your calm.profile diagnostic report</h2>
+            
+            <p>thank you for completing the calm.profile assessment for <strong>{company_name}</strong>.</p>
+            
+            <p>your personalized diagnostic report is ready for download:</p>
+            
+            <p><a href="{pdf_url}" style="color: #00c9a7; text-decoration: none; font-weight: 500;">download report (pdf)</a></p>
+            
+            <p>the report includes:</p>
+            <ul>
+                <li>behavioral archetype analysis</li>
+                <li>productivity overhead assessment</li>
+                <li>roi projections and sensitivity analysis</li>
+                <li>prioritized recommendations</li>
+                <li>30/60/90 implementation roadmap</li>
+            </ul>
+            
+            <p>questions about your results? <a href="{CALENDLY_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
+            
+            <p style="margin-top: 32px; font-size: 12px; color: #666666;">
+                syrıs<span style="color: #00c9a7;">.</span> — calm in the chaos of creative work
+            </p>
+        </body>
+        </html>
+        """,
+    }
+
+    response = requests.post(
+        "https://api.resend.com/emails", headers=headers, json=data
+    )
+    return response.status_code == 200
 
 
 # ---------- health ----------
@@ -455,6 +728,121 @@ def stripe_webhook():
         return _json({"received": True})
     except Exception as e:
         g.db.rollback()
+        return _json({"error": str(e)}, status=500)
+
+
+@app.post("/api/stripe/webhook")
+def api_stripe_webhook():
+    """new webhook endpoint for pdf generation and email"""
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers.get("Stripe-Signature", "")
+
+    if not STRIPE_WEBHOOK_SECRET:
+        return _json({"error": "webhook secret not configured"}, status=500)
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload=payload, sig_header=sig_header, secret=STRIPE_WEBHOOK_SECRET
+        )
+    except Exception as e:
+        return _json({"error": f"invalid signature: {e}"}, status=400)
+
+    event_type = event["type"]
+    event_id = event["id"]
+
+    # check for duplicate events
+    existing_event = g.db.execute(
+        select(Payment).where(Payment.stripe_event_id == event_id)
+    ).scalar_one_or_none()
+    if existing_event:
+        return _json({"received": True, "idempotent": True})
+
+    try:
+        if event_type == "checkout.session.completed":
+            session_obj = event["data"]["object"]
+            session_id = session_obj.get("id")
+            customer_email = (session_obj.get("customer_details") or {}).get("email")
+            assessment_id = session_obj.get("metadata", {}).get("assessment_id")
+
+            if not customer_email:
+                app.logger.error("no customer email in session")
+                return _json({"error": "no customer email"}, status=400)
+
+            if not assessment_id:
+                app.logger.error("no assessment_id in session metadata")
+                return _json({"error": "no assessment_id"}, status=400)
+
+            # fetch assessment data
+            assessment_row = g.db.execute(
+                select(Assessment).where(Assessment.id == int(assessment_id))
+            ).scalar_one_or_none()
+
+            if not assessment_row:
+                app.logger.error(f"assessment not found: {assessment_id}")
+                return _json({"error": "assessment not found"}, status=404)
+
+            # parse assessment data
+            assessment_data = json.loads(assessment_row.data or "{}")
+
+            # add metadata
+            assessment_data.update(
+                {
+                    "company_name": "your organization",  # could be extracted from context
+                    "assessment_date": assessment_row.created_at.strftime("%b %d, %Y"),
+                    "report_id": f"report-{assessment_id}-{datetime.now().strftime('%Y%m%d')}",
+                    "assessment_id": str(assessment_id),
+                    "completion_date": assessment_row.created_at.strftime("%Y-%m-%d"),
+                    "customer_email": customer_email,
+                }
+            )
+
+            # generate pdf and get s3 url
+            pdf_url = generate_pdf_report(assessment_data, customer_email)
+
+            # send email
+            email_sent = send_report_email(
+                customer_email,
+                pdf_url,
+                assessment_data.get("company_name", "your organization"),
+            )
+
+            if not email_sent:
+                app.logger.warning(f"email failed to send for {customer_email}")
+
+            # update payment record
+            payment_row = g.db.execute(
+                select(Payment).where(Payment.stripe_session_id == session_id)
+            ).scalar_one_or_none()
+
+            if payment_row:
+                payment_row.stripe_event_id = event_id
+                payment_row.status = "completed"
+                g.db.commit()
+            else:
+                # create payment record if not exists
+                g.db.add(
+                    Payment(
+                        assessment_id=int(assessment_id),
+                        stripe_session_id=session_id,
+                        stripe_event_id=event_id,
+                        status="completed",
+                        customer_email=customer_email,
+                    )
+                )
+                g.db.commit()
+
+            app.logger.info(
+                f"report generated and emailed for assessment {assessment_id}"
+            )
+            return _json(
+                {"received": True, "pdf_url": pdf_url, "email_sent": email_sent}
+            )
+
+        return _json({"received": True, "event_type": event_type})
+
+    except Exception as e:
+        g.db.rollback()
+        app.logger.error(f"webhook processing failed: {str(e)}")
         return _json({"error": str(e)}, status=500)
 
 
