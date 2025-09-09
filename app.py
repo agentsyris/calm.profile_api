@@ -225,11 +225,11 @@ def generate_pdf_report(assessment_data: dict, customer_email: str) -> str:
                 return s3_url
             except Exception as e:
                 app.logger.warning(f"s3 upload failed, using local storage: {e}")
-        
+
         # fallback: keep file locally and return local path
         # cleanup temp json but keep pdf
         os.unlink(temp_json_path)
-        
+
         # return local file path (in production, you'd want to serve this via your app)
         return f"local://{pdf_path}"
 
@@ -302,15 +302,19 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
         pdf_path = pdf_url.replace("local://", "")
         try:
             with open(pdf_path, "rb") as f:
-                pdf_content = base64.b64encode(f.read()).decode('utf-8')
-            
-            attachments = [{
-                "Name": "calm_profile_report.pdf",
-                "Content": pdf_content,
-                "ContentType": "application/pdf"
-            }]
-            
-            download_text = "your personalized diagnostic report is attached to this email."
+                pdf_content = base64.b64encode(f.read()).decode("utf-8")
+
+            attachments = [
+                {
+                    "Name": "calm_profile_report.pdf",
+                    "Content": pdf_content,
+                    "ContentType": "application/pdf",
+                }
+            ]
+
+            download_text = (
+                "your personalized diagnostic report is attached to this email."
+            )
             download_link = ""
         except Exception as e:
             app.logger.error(f"failed to read local pdf: {e}")
@@ -375,7 +379,7 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
         syrıs. — calm in the chaos of creative work
         """,
     }
-    
+
     # add attachments if we have them
     if attachments:
         data["Attachments"] = attachments
