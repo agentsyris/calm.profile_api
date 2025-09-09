@@ -383,24 +383,24 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         "efficiency_review": 8,
         "efficiency_communication": 5,
         "workflow_bottlenecks": "meeting overload and context switching",
-        # roi calculations
-        "base_overhead": 12.0,
+        # roi calculations (scale with team size)
+        "base_overhead": metrics.get("overhead_index", 0) * 100,
         "archetype_adjustment": 1.2,
-        "weekly_cost": 2400.0,
-        # sensitivity analysis
+        "weekly_cost": metrics.get("annual_cost", 0) / 52 if metrics.get("annual_cost", 0) > 0 else context.get("hourly_rate", 100) * 5 * context.get("team_size", 1),
+        # sensitivity analysis (scale with team size)
         "sensitivity_25_margin": 15.0,
-        "sensitivity_25_cost": 180000.0,
+        "sensitivity_25_cost": 180000.0 * (context.get("team_size", 1) / 4.0),
         "sensitivity_25_hours": 4.0,
         "sensitivity_50_margin": 20.0,
-        "sensitivity_50_cost": 240000.0,
+        "sensitivity_50_cost": 240000.0 * (context.get("team_size", 1) / 4.0),
         "sensitivity_50_hours": 6.0,
         "sensitivity_75_margin": 25.0,
-        "sensitivity_75_cost": 300000.0,
+        "sensitivity_75_cost": 300000.0 * (context.get("team_size", 1) / 4.0),
         "sensitivity_75_hours": 8.0,
-        # 5-year projections
-        "conservative_5yr": 450000.0,
-        "realistic_5yr": 600000.0,
-        "optimistic_5yr": 750000.0,
+        # 5-year projections (scale with team size)
+        "conservative_5yr": 450000.0 * (context.get("team_size", 1) / 4.0),
+        "realistic_5yr": 600000.0 * (context.get("team_size", 1) / 4.0),
+        "optimistic_5yr": 750000.0 * (context.get("team_size", 1) / 4.0),
         # savings projections
         "savings_month1": 5.0,
         "savings_month3": 15.0,
