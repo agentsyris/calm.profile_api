@@ -73,7 +73,10 @@ AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 # Email service config
 POSTMARK_API_TOKEN = os.environ.get("POSTMARK_API_TOKEN", "")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-CALENDLY_URL = os.environ.get("CALENDLY_URL", "https://calendly.com/syris-studio")
+CALENDLY_URL = os.environ.get("CALENDLY_URL", "https://calendly.com/syris/intro")
+CALENDLY_CONSULTATION_URL = os.environ.get(
+    "CALENDLY_CONSULTATION_URL", "https://calendly.com/syris/30min"
+)
 
 stripe.api_key = STRIPE_SECRET_KEY
 
@@ -661,7 +664,7 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
                 <li>30/60/90 implementation roadmap</li>
             </ul>
             
-            <p>questions about your results? <a href="{CALENDLY_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
+            <p>questions about your results? <a href="{CALENDLY_CONSULTATION_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
             
             <p style="margin-top: 32px; font-size: 12px; color: #666666;">
                 syrıs<span style="color: #00c9a7;">.</span> — calm in the chaos of creative work
@@ -684,7 +687,7 @@ def send_postmark_email(customer_email: str, pdf_url: str, company_name: str) ->
         - prioritized recommendations
         - 30/60/90 implementation roadmap
         
-        questions about your results? schedule a consultation: {CALENDLY_URL}
+        questions about your results? schedule a consultation: {CALENDLY_CONSULTATION_URL}
         
         syrıs. — calm in the chaos of creative work
         """,
@@ -739,7 +742,7 @@ def send_resend_email(customer_email: str, pdf_url: str, company_name: str) -> b
                 <li>30/60/90 implementation roadmap</li>
             </ul>
             
-            <p>questions about your results? <a href="{CALENDLY_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
+            <p>questions about your results? <a href="{CALENDLY_CONSULTATION_URL}" style="color: #00c9a7;">schedule a consultation</a></p>
             
             <p style="margin-top: 32px; font-size: 12px; color: #666666;">
                 syrıs<span style="color: #00c9a7;">.</span> — calm in the chaos of creative work
@@ -788,7 +791,7 @@ def send_postmark_intro_followup(invitee_email: str) -> bool:
         "Subject": "ready to start your calm.sys journey?",
         "TextBody": """thanks for the intro call. if you're ready, apply with calm.profile — it's a $495 application fully credited to your $2,950 sprint. 3–5 day diagnostic, 30-min debrief, 5x roi guarantee.
 
-apply here: https://calmprofile.vercel.app
+apply here: https://syris.systems/calm-profile
 
 —
 syrıs.
@@ -817,7 +820,7 @@ def send_resend_intro_followup(invitee_email: str) -> bool:
         "subject": "ready to start your calm.sys journey?",
         "text": """thanks for the intro call. if you're ready, apply with calm.profile — it's a $495 application fully credited to your $2,950 sprint. 3–5 day diagnostic, 30-min debrief, 5x roi guarantee.
 
-apply here: https://calmprofile.vercel.app
+apply here: https://syris.systems/calm-profile
 
 —
 syrıs.
@@ -1287,7 +1290,7 @@ def api_stripe_webhook():
 
 @app.get("/api/check-calendly-bookings")
 def check_calendly_bookings():
-    """poll calendly api for new intro call bookings (free plan workaround)"""
+    """poll calendly api for new intro call and assessment bookings (free plan workaround)"""
     try:
         import requests
 
@@ -1332,8 +1335,8 @@ def check_calendly_bookings():
         for event in events_data.get("collection", []):
             event_name = event.get("name", "").lower()
 
-            # check if this is an intro call
-            if "intro" in event_name:
+            # check if this is an intro call or 30-min assessment
+            if "intro" in event_name or ("30" in event_name and "min" in event_name):
                 event_uri = event["uri"]
 
                 # get event details to check if we've already processed it
@@ -1349,9 +1352,9 @@ def check_calendly_bookings():
                     ).scalar_one_or_none()
 
                     if not existing_event:
-                        # this is a new intro call booking
+                        # this is a new intro call or assessment booking
                         app.logger.info(
-                            f"new intro call booking found: {invitee_email}"
+                            f"new intro call or assessment booking found: {invitee_email}"
                         )
 
                         # send follow-up email
@@ -1377,7 +1380,7 @@ def check_calendly_bookings():
 
         return _json(
             {
-                "message": f"checked calendly bookings, found {len(new_bookings)} new intro calls",
+                "message": f"checked calendly bookings, found {len(new_bookings)} new intro calls and assessments",
                 "new_bookings": new_bookings,
             }
         )
@@ -1401,15 +1404,17 @@ def calendly_webhook():
 
         app.logger.info(f"calendly webhook received: {event_type}")
 
-        # Only process event_scheduled for 15-min intro calls
+        # Process event_scheduled for 15-min intro calls and 30-min assessments
         if event_type == "invitee.created" or event_type == "event_scheduled":
             invitee_email = event_data.get("invitee", {}).get("email")
             event_name = event_data.get("event_type", {}).get("name", "")
 
-            # Check if this is an intro call (15-min or intro event)
+            # Check if this is an intro call (15-min or intro event) or 30-min assessment
             if (
-                "15" in event_name.lower() and "min" in event_name.lower()
-            ) or "intro" in event_name.lower():
+                ("15" in event_name.lower() and "min" in event_name.lower())
+                or "intro" in event_name.lower()
+                or ("30" in event_name.lower() and "min" in event_name.lower())
+            ):
                 app.logger.info(f"sending intro call follow-up to {invitee_email}")
 
                 # Send follow-up email
