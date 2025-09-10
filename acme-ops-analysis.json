@@ -1,0 +1,307 @@
+{
+  "agency_profile": {
+    "name": "ACME Creative Agency",
+    "headcount": 31,
+    "type": "Creative Agency",
+    "analysis_date": "2025-01-15",
+    "fiscal_year": "2025"
+  },
+  
+  "executive_summary": {
+    "headline_roi": "25% operational efficiency gain possible through workflow optimization, saving $847K annually",
+    "top_findings_bullets": [
+      "47% of project time spent in revision cycles due to unclear initial scoping (F2)",
+      "RASIC gaps causing 31% deadline slippage on multi-stakeholder projects (F3)",
+      "Creative team utilization at 112% while strategy at 68% indicates resource imbalance (F1)",
+      "Change order capture rate at 23% leaving $1.2M revenue uncaptured annually (F4)",
+      "QA bottleneck adding 3.2 days average to delivery timeline (F5)"
+    ],
+    "priority_moves_bullets": [
+      "Implement structured intake process with mandatory creative brief (R1)",
+      "Deploy RASIC training and project kickoff templates (R2)",
+      "Establish resource leveling protocol between creative and strategy (R3)",
+      "Automate change order tracking with client approval workflows (R4)",
+      "Create parallel QA track for low-risk deliverables (R5)"
+    ]
+  },
+  
+  "workstyle_analysis": {
+    "archetype": "Collaborative Creator",
+    "axis_scores": {
+      "structure_flexibility": 3.2,
+      "speed_quality": 4.1,
+      "autonomy_collaboration": 4.7,
+      "innovation_execution": 3.8
+    },
+    "ties_to_findings": {
+      "f2_connection": "High collaboration score (4.7) contributes to revision cycles as multiple stakeholders provide input without clear decision rights, extending project timelines by 47%",
+      "f3_connection": "Low structure score (3.2) directly correlates with RASIC gaps - teams default to consensus-building rather than defined accountability, causing 31% deadline slippage"
+    }
+  },
+  
+  "rasic_matrix": {
+    "intake": {
+      "account": "R",
+      "pm": "A",
+      "creative": "C",
+      "strategy": "S",
+      "ops": "I",
+      "qa": "-"
+    },
+    "scoping": {
+      "account": "C",
+      "pm": "A",
+      "creative": "S",
+      "strategy": "R",
+      "ops": "I",
+      "qa": "-"
+    },
+    "production": {
+      "account": "I",
+      "pm": "A",
+      "creative": "R",
+      "strategy": "C",
+      "ops": "S",
+      "qa": "C"
+    },
+    "qa": {
+      "account": "I",
+      "pm": "S",
+      "creative": "C",
+      "strategy": "C",
+      "ops": "I",
+      "qa": "R/A"
+    },
+    "delivery": {
+      "account": "R",
+      "pm": "A",
+      "creative": "S",
+      "strategy": "I",
+      "ops": "C",
+      "qa": "S"
+    }
+  },
+  
+  "findings": {
+    "f1": {
+      "issue": "Resource utilization imbalance across departments",
+      "evidence": "Time tracking data shows creative at 112% capacity, strategy at 68%",
+      "source": "Harvest timesheet analysis",
+      "date": "2024-12-15",
+      "impact_per_quarter": "$212,000",
+      "root_cause": "Project allocation based on relationships rather than capacity planning",
+      "preview_recommendation": "r3"
+    },
+    "f2": {
+      "issue": "Excessive revision cycles due to unclear initial requirements",
+      "evidence": "Average 4.3 revision rounds per project vs industry standard 2.1",
+      "source": "Project management system audit",
+      "date": "2024-11-30",
+      "impact_per_quarter": "$178,000",
+      "root_cause": "No standardized creative brief process; stakeholders provide feedback post-production",
+      "preview_recommendation": "r1"
+    },
+    "f3": {
+      "issue": "RASIC gaps causing project delays and rework",
+      "evidence": "31% of projects miss deadline due to unclear approval chains",
+      "source": "Client satisfaction survey & delivery metrics",
+      "date": "2024-12-20",
+      "impact_per_quarter": "$156,000",
+      "root_cause": "No documented decision rights; multiple approvers emerge late in process",
+      "preview_recommendation": "r2"
+    },
+    "f4": {
+      "issue": "Low change order capture rate",
+      "evidence": "Only 23% of scope changes result in approved change orders",
+      "source": "Financial reconciliation report",
+      "date": "2025-01-10",
+      "impact_per_quarter": "$301,000",
+      "root_cause": "Account teams prioritize client relationships over contract enforcement",
+      "preview_recommendation": "r4"
+    },
+    "f5": {
+      "issue": "QA bottleneck delaying final delivery",
+      "evidence": "Single QA resource handling all projects; 3.2 day average queue time",
+      "source": "Workflow analysis & bottleneck report",
+      "date": "2024-12-28",
+      "impact_per_quarter": "$89,000",
+      "root_cause": "All deliverables routed through single QA regardless of risk level",
+      "preview_recommendation": "r5"
+    }
+  },
+  
+  "roi_analysis": {
+    "p8_current_cost_table": {
+      "work_types": {
+        "brand_campaigns": {
+          "annual_volume": 24,
+          "avg_hours": 312,
+          "total_hours": 7488,
+          "hourly_rate": 175,
+          "total_cost": 1310400
+        },
+        "digital_assets": {
+          "annual_volume": 148,
+          "avg_hours": 42,
+          "total_hours": 6216,
+          "hourly_rate": 150,
+          "total_cost": 932400
+        },
+        "strategy_consulting": {
+          "annual_volume": 18,
+          "avg_hours": 186,
+          "total_hours": 3348,
+          "hourly_rate": 225,
+          "total_cost": 753300
+        },
+        "content_production": {
+          "annual_volume": 210,
+          "avg_hours": 28,
+          "total_hours": 5880,
+          "hourly_rate": 125,
+          "total_cost": 735000
+        },
+        "retainer_services": {
+          "annual_volume": 12,
+          "avg_hours": 520,
+          "total_hours": 6240,
+          "hourly_rate": 140,
+          "total_cost": 873600
+        }
+      },
+      "total_annual_cost": 4604700,
+      "total_annual_hours": 29172
+    },
+    
+    "p9_scenarios": {
+      "conservative_25": {
+        "efficiency_gain": "25%",
+        "hours_saved": 7293,
+        "cost_savings": 847000,
+        "implementation_cost": 215000,
+        "net_benefit_year1": 632000,
+        "payback_months": 3.8
+      },
+      "moderate_50": {
+        "efficiency_gain": "50%",
+        "hours_saved": 10938,
+        "cost_savings": 1270500,
+        "implementation_cost": 385000,
+        "net_benefit_year1": 885500,
+        "payback_months": 4.2
+      },
+      "aggressive_75": {
+        "efficiency_gain": "75%",
+        "hours_saved": 14586,
+        "cost_savings": 1694000,
+        "implementation_cost": 620000,
+        "net_benefit_year1": 1074000,
+        "payback_months": 5.6
+      }
+    },
+    
+    "five_year_curve": {
+      "assumptions": {
+        "annual_growth_rate": "8%",
+        "efficiency_decay_rate": "5%",
+        "technology_refresh_cycle": "3 years",
+        "training_reinforcement": "quarterly"
+      },
+      "projections": [
+        {"year": 1, "savings": 847000, "cumulative": 847000},
+        {"year": 2, "savings": 888000, "cumulative": 1735000},
+        {"year": 3, "savings": 915000, "cumulative": 2650000},
+        {"year": 4, "savings": 942000, "cumulative": 3592000},
+        {"year": 5, "savings": 970000, "cumulative": 4562000}
+      ]
+    }
+  },
+  
+  "recommendations": {
+    "r1": {
+      "title": "Implement structured creative brief process",
+      "linked_finding": "f2",
+      "owner": "Head of Account Management",
+      "effort": "Medium",
+      "impact": "High",
+      "timeline": "Q1 2025",
+      "dependencies": ["PM system configuration", "Client education", "Team training"],
+      "success_metrics": ["Revision rounds < 2.5", "Brief completion rate > 95%"]
+    },
+    "r2": {
+      "title": "Deploy RASIC training and templates",
+      "linked_finding": "f3",
+      "owner": "COO",
+      "effort": "Low",
+      "impact": "High",
+      "timeline": "Q1 2025",
+      "dependencies": ["Leadership alignment", "Template creation"],
+      "success_metrics": ["On-time delivery > 85%", "Decision escalations < 10%"]
+    },
+    "r3": {
+      "title": "Establish resource leveling protocol",
+      "linked_finding": "f1",
+      "owner": "Resource Manager",
+      "effort": "High",
+      "impact": "High",
+      "timeline": "Q2 2025",
+      "dependencies": ["Capacity planning tool", "Cross-training program"],
+      "success_metrics": ["Utilization variance < 15%", "Overtime hours < 10%"]
+    },
+    "r4": {
+      "title": "Automate change order workflows",
+      "linked_finding": "f4",
+      "owner": "Head of Operations",
+      "effort": "Medium",
+      "impact": "Very High",
+      "timeline": "Q1-Q2 2025",
+      "dependencies": ["System integration", "Contract template updates"],
+      "success_metrics": ["Change order capture > 75%", "Approval time < 48hrs"]
+    },
+    "r5": {
+      "title": "Create tiered QA process",
+      "linked_finding": "f5",
+      "owner": "QA Lead",
+      "effort": "Low",
+      "impact": "Medium",
+      "timeline": "Q1 2025",
+      "dependencies": ["Risk assessment matrix", "Junior QA hiring"],
+      "success_metrics": ["QA cycle time < 1 day", "Error rate < 2%"]
+    }
+  },
+  
+  "roadmap_kpis": {
+    "on_time_delivery": {
+      "current": "69%",
+      "q1_target": "75%",
+      "q2_target": "82%",
+      "q3_target": "87%",
+      "q4_target": "90%",
+      "measurement": "Projects delivered by contracted date / Total projects"
+    },
+    "project_latency": {
+      "current": "3.2 days",
+      "q1_target": "2.5 days",
+      "q2_target": "1.8 days",
+      "q3_target": "1.2 days",
+      "q4_target": "0.8 days",
+      "measurement": "Average days between phases"
+    },
+    "capacity_variance": {
+      "current": "44%",
+      "q1_target": "35%",
+      "q2_target": "25%",
+      "q3_target": "18%",
+      "q4_target": "15%",
+      "measurement": "Standard deviation of utilization across teams"
+    },
+    "change_order_capture": {
+      "current": "23%",
+      "q1_target": "40%",
+      "q2_target": "55%",
+      "q3_target": "70%",
+      "q4_target": "75%",
+      "measurement": "Approved change orders / Identified scope changes"
+    }
+  }
+}

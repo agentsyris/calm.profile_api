@@ -441,12 +441,12 @@ def validate_template_fields(data: Dict[str, Any]) -> bool:
             continue
 
         value = data[field_name]
-        
+
         # Allow int values for float fields (automatic conversion)
         if expected_type == float and isinstance(value, int):
             data[field_name] = float(value)  # Convert int to float
             continue
-            
+
         if not isinstance(value, expected_type):
             type_errors.append(
                 f"{field_name}: expected {expected_type.__name__}, got {type(value).__name__}"
@@ -455,7 +455,7 @@ def validate_template_fields(data: Dict[str, Any]) -> bool:
     if missing_fields:
         logger.warning(f"Missing template fields: {missing_fields}")
         # Don't fail validation for missing fields - they have defaults
-        
+
     if type_errors:
         logger.error(f"Type errors: {type_errors}")
         return False

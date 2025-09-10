@@ -6,3 +6,7 @@ instance/
 .DS_Store
 .env
 .env.*
+
+# Generated outputs
+/out/*
+*.generated.html

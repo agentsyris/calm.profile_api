@@ -386,7 +386,11 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         # roi calculations (scale with team size)
         "base_overhead": metrics.get("overhead_index", 0) * 100,
         "archetype_adjustment": 1.2,
-        "weekly_cost": metrics.get("annual_cost", 0) / 52 if metrics.get("annual_cost", 0) > 0 else context.get("hourly_rate", 100) * 5 * context.get("team_size", 1),
+        "weekly_cost": (
+            metrics.get("annual_cost", 0) / 52
+            if metrics.get("annual_cost", 0) > 0
+            else context.get("hourly_rate", 100) * 5 * context.get("team_size", 1)
+        ),
         # sensitivity analysis (scale with team size)
         "sensitivity_25_margin": 15.0,
         "sensitivity_25_cost": 180000.0 * (context.get("team_size", 1) / 4.0),
