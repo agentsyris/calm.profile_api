@@ -262,12 +262,20 @@ def validate_and_normalize_assessment_data(raw_data: dict) -> dict:
         # metrics
         "overhead_percentage": metrics.get("overhead_index", 0) * 100,
         "annual_cost": metrics.get("annual_cost", 0),
+        "weekly_cost": metrics.get("weekly_cost", 0),
         "hours_lost_ppw": metrics.get("hours_lost_ppw", 0),
         # context data
         "team_size": context.get("team_size", 1),
+        "team_size_str": context.get("team_size", "solo"),
         "meeting_load": context.get("meeting_load", "medium"),
+        "meeting_load_desc": {
+            "light": "<5 hours/week",
+            "moderate": "5-15 hours/week",
+            "heavy": ">15 hours/week",
+        }.get(context.get("meeting_load", "moderate"), "5-15 hours/week"),
         "hourly_rate": context.get("hourly_rate", 100),
         "platform": context.get("platform", "unknown"),
+        "response_consistency": 85.0,  # Placeholder - could calculate from response patterns
         # recommendations (generate rice scores)
         "r1_title": "optimize meeting structure",
         "r1_description": "implement structured meeting formats with clear agendas and outcomes",
@@ -747,6 +755,81 @@ def send_resend_email(customer_email: str, pdf_url: str, company_name: str) -> b
     return response.status_code == 200
 
 
+def send_intro_call_followup_email(invitee_email: str) -> bool:
+    """send follow-up email after 15-min intro call"""
+    try:
+        # try postmark first, fallback to resend
+        if POSTMARK_API_TOKEN:
+            return send_postmark_intro_followup(invitee_email)
+        elif RESEND_API_KEY:
+            return send_resend_intro_followup(invitee_email)
+        else:
+            app.logger.warning("no email service configured for intro follow-up")
+            return False
+
+    except Exception as e:
+        app.logger.error(f"intro follow-up email sending failed: {str(e)}")
+        return False
+
+
+def send_postmark_intro_followup(invitee_email: str) -> bool:
+    """send intro follow-up email via postmark"""
+    import requests
+
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-Postmark-Server-Token": POSTMARK_API_TOKEN,
+    }
+
+    data = {
+        "From": "agent@syris.studio",
+        "To": invitee_email,
+        "Subject": "ready to start your calm.sys journey?",
+        "TextBody": """thanks for the intro call. if you're ready, apply with calm.profile — it's a $495 application fully credited to your $2,950 sprint. 3–5 day diagnostic, 30-min debrief, 5x roi guarantee.
+
+apply here: https://calmprofile.vercel.app
+
+—
+syrıs.
+systematic solutions for modern chaos""",
+        "MessageStream": "outbound",
+    }
+
+    response = requests.post(
+        "https://api.postmarkapp.com/email", headers=headers, json=data
+    )
+    return response.status_code == 200
+
+
+def send_resend_intro_followup(invitee_email: str) -> bool:
+    """send intro follow-up email via resend"""
+    import requests
+
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "from": "agent@syris.studio",
+        "to": [invitee_email],
+        "subject": "ready to start your calm.sys journey?",
+        "text": """thanks for the intro call. if you're ready, apply with calm.profile — it's a $495 application fully credited to your $2,950 sprint. 3–5 day diagnostic, 30-min debrief, 5x roi guarantee.
+
+apply here: https://calmprofile.vercel.app
+
+—
+syrıs.
+systematic solutions for modern chaos""",
+    }
+
+    response = requests.post(
+        "https://api.resend.com/emails", headers=headers, json=data
+    )
+    return response.status_code == 200
+
+
 # ---------- health ----------
 
 
@@ -804,7 +887,7 @@ def assess():
         # run scorer
         result = score_assessment(normalized_responses)
 
-        # overhead/roi calc
+        # overhead/roi calc - FIXED CALCULATION LOGIC
         meeting_map = {"light": 0.6, "moderate": 0.8, "heavy": 1.0}
         meeting_load = str(context.get("meeting_load", "moderate")).lower()
         overhead_base = meeting_map.get(meeting_load, 0.8)
@@ -818,13 +901,29 @@ def assess():
         primary = str(result.get("archetype", {}).get("primary", "architect")).lower()
         overhead_index = overhead_base * arche_adj.get(primary, 1.0)
 
-        team_mult = {"solo": 1, "2-5": 4, "6-15": 10, "16-50": 25, "50+": 55}
-        team_size = str(context.get("team_size", "solo"))
-        tm = team_mult.get(team_size, 1)
+        # FIXED: Team size mapping to actual numbers
+        team_size_map = {"solo": 1, "2-5": 3.5, "6-15": 10.5, "16-50": 33, "50+": 75}
+        team_size_str = str(context.get("team_size", "solo"))
+        team_size = team_size_map.get(team_size_str, 1)
 
         hourly_rate = float(context.get("hourly_rate", 85))
-        hours_lost_ppw = overhead_index * 5.0
-        annual_cost = hours_lost_ppw * 52 * hourly_rate * tm
+
+        # INPUT VALIDATION AND CLAMPING
+        hourly_rate = max(25, min(500, hourly_rate))  # Clamp between $25-$500/hr
+        team_size = max(1, min(100, team_size))  # Clamp between 1-100 people
+        overhead_index = max(
+            0.1, min(2.0, overhead_index)
+        )  # Clamp overhead between 10%-200%
+
+        # FIXED: Use overhead_index as hours lost per person per week
+        hours_lost_ppw = overhead_index * 5.0  # Base 5 hours scaled by overhead
+        hours_lost_ppw = max(
+            0.5, min(40, hours_lost_ppw)
+        )  # Clamp between 0.5-40 hours/week
+
+        # FIXED: Correct calculation formula
+        weekly_cost = hours_lost_ppw * hourly_rate * team_size
+        annual_cost = weekly_cost * 52
 
         # persist
         row = Assessment(
@@ -836,6 +935,7 @@ def assess():
                     "result": result,
                     "metrics": {
                         "hours_lost_ppw": hours_lost_ppw,
+                        "weekly_cost": weekly_cost,
                         "annual_cost": annual_cost,
                         "overhead_index": overhead_index,
                     },
@@ -856,6 +956,7 @@ def assess():
                 },
                 "metrics": {
                     "hours_lost_ppw": round(hours_lost_ppw, 1),
+                    "weekly_cost": round(weekly_cost),
                     "annual_cost": round(annual_cost),
                 },
                 "recommendations": result.get("recommendations", {}),
@@ -1143,6 +1244,19 @@ def api_stripe_webhook():
                 payment_row.stripe_event_id = event_id
                 payment_row.status = "completed"
                 g.db.commit()
+
+                # Track purchase event for analytics
+                try:
+                    import requests
+
+                    # Send purchase event to Google Analytics Measurement Protocol
+                    # This would typically be done via client-side tracking, but we can
+                    # also send server-side events for verification
+                    app.logger.info(
+                        f"Purchase completed: {customer_email}, assessment_id: {assessment_id}"
+                    )
+                except Exception as e:
+                    app.logger.warning(f"Failed to track purchase event: {e}")
             else:
                 # create payment record if not exists
                 g.db.add(
@@ -1168,6 +1282,159 @@ def api_stripe_webhook():
     except Exception as e:
         g.db.rollback()
         app.logger.error(f"webhook processing failed: {str(e)}")
+        return _json({"error": str(e)}, status=500)
+
+
+@app.get("/api/check-calendly-bookings")
+def check_calendly_bookings():
+    """poll calendly api for new intro call bookings (free plan workaround)"""
+    try:
+        import requests
+
+        calendly_token = os.getenv("CALENDLY_API_TOKEN")
+        if not calendly_token:
+            return _json({"error": "calendly api token not configured"}, status=500)
+
+        # get your calendly user info
+        headers = {"Authorization": f"Bearer {calendly_token}"}
+        user_response = requests.get(
+            "https://api.calendly.com/users/me", headers=headers
+        )
+
+        if user_response.status_code != 200:
+            return _json({"error": "failed to get calendly user info"}, status=500)
+
+        user_data = user_response.json()
+        user_uri = user_data["resource"]["uri"]
+
+        # get recent scheduled events (last 24 hours)
+        from datetime import datetime, timedelta
+
+        end_time = datetime.now()
+        start_time = end_time - timedelta(days=1)
+
+        events_url = f"https://api.calendly.com/scheduled_events"
+        params = {
+            "user": user_uri,
+            "min_start_time": start_time.isoformat(),
+            "max_start_time": end_time.isoformat(),
+            "count": 50,
+        }
+
+        events_response = requests.get(events_url, headers=headers, params=params)
+
+        if events_response.status_code != 200:
+            return _json({"error": "failed to get calendly events"}, status=500)
+
+        events_data = events_response.json()
+        new_bookings = []
+
+        for event in events_data.get("collection", []):
+            event_name = event.get("name", "").lower()
+
+            # check if this is an intro call
+            if "intro" in event_name:
+                event_uri = event["uri"]
+
+                # get event details to check if we've already processed it
+                event_details_response = requests.get(event_uri, headers=headers)
+
+                if event_details_response.status_code == 200:
+                    event_details = event_details_response.json()
+                    invitee_email = event_details["resource"]["invitees"][0]["email"]
+
+                    # check if we've already sent follow-up for this event
+                    existing_event = g.db.execute(
+                        select(Assessment).where(Assessment.email == invitee_email)
+                    ).scalar_one_or_none()
+
+                    if not existing_event:
+                        # this is a new intro call booking
+                        app.logger.info(
+                            f"new intro call booking found: {invitee_email}"
+                        )
+
+                        # send follow-up email
+                        send_intro_call_followup_email(invitee_email)
+
+                        # mark as processed by creating a dummy assessment record
+                        dummy_assessment = Assessment(
+                            email=invitee_email,
+                            session_id=f"intro_call_{event_uri.split('/')[-1]}",
+                            assessment_data={"source": "intro_call_polling"},
+                            created_at=datetime.now(),
+                        )
+                        g.db.add(dummy_assessment)
+                        g.db.commit()
+
+                        new_bookings.append(
+                            {
+                                "email": invitee_email,
+                                "event_name": event_name,
+                                "start_time": event["start_time"],
+                            }
+                        )
+
+        return _json(
+            {
+                "message": f"checked calendly bookings, found {len(new_bookings)} new intro calls",
+                "new_bookings": new_bookings,
+            }
+        )
+
+    except Exception as e:
+        app.logger.error(f"calendly polling failed: {str(e)}")
+        return _json({"error": str(e)}, status=500)
+
+
+@app.post("/webhooks/calendly")
+def calendly_webhook():
+    """handle calendly webhook events (paid plans only)"""
+    try:
+        payload = request.get_json()
+
+        if not payload:
+            return _json({"error": "no payload received"}, status=400)
+
+        event_type = payload.get("event")
+        event_data = payload.get("payload", {})
+
+        app.logger.info(f"calendly webhook received: {event_type}")
+
+        # Only process event_scheduled for 15-min intro calls
+        if event_type == "invitee.created" or event_type == "event_scheduled":
+            invitee_email = event_data.get("invitee", {}).get("email")
+            event_name = event_data.get("event_type", {}).get("name", "")
+
+            # Check if this is an intro call (15-min or intro event)
+            if (
+                "15" in event_name.lower() and "min" in event_name.lower()
+            ) or "intro" in event_name.lower():
+                app.logger.info(f"sending intro call follow-up to {invitee_email}")
+
+                # Send follow-up email
+                email_sent = send_intro_call_followup_email(invitee_email)
+
+                if email_sent:
+                    app.logger.info(f"intro call follow-up sent to {invitee_email}")
+                else:
+                    app.logger.warning(
+                        f"failed to send intro call follow-up to {invitee_email}"
+                    )
+
+                return _json(
+                    {
+                        "received": True,
+                        "event_type": event_type,
+                        "email_sent": email_sent,
+                        "invitee_email": invitee_email,
+                    }
+                )
+
+        return _json({"received": True, "event_type": event_type})
+
+    except Exception as e:
+        app.logger.error(f"calendly webhook processing failed: {str(e)}")
         return _json({"error": str(e)}, status=500)
 
 

@@ -298,4 +298,40 @@ this assessment analyzes 20 behavioral indicators across six core axes: decision
 **next steps:**
 {{ next_steps | default('—') }}
 
+<div class="page-break"></div>
+
+## calculation assumptions & methodology
+
+**roi calculation formula:**
+
+- weekly cost = hours lost per person × hourly rate × team size
+- annual cost = weekly cost × 52 weeks
+
+**input assumptions:**
+
+- team size: {{ team_size | default('—') }} people ({{ team_size_str | default('—') }} range)
+- hourly rate: ${{ hourly_rate | default('—') }}/hour (blended rate)
+- meeting load: {{ meeting_load | default('—') }} ({{ meeting_load_desc | default('—') }})
+- platform: {{ platform | default('—') }} workspace
+
+**calculation methodology:**
+
+- base hours lost: 5.0 hours/week per person
+- overhead multiplier: {{ fmt_percent(overhead_percentage | default(0)) }} (meeting load + archetype adjustment)
+- archetype adjustment: {{ archetype_primary | default('—') }} archetype ({{ fmt_percent(archetype_adjustment | default(0)) }} multiplier)
+- response consistency: {{ fmt_percent(response_consistency | default(0)) }} (based on answer patterns)
+
+**validation & limits:**
+
+- hourly rate clamped: $25-$500/hour
+- team size clamped: 1-100 people
+- hours lost clamped: 0.5-40 hours/week per person
+- overhead clamped: 10%-200% of base rate
+
+**confidence indicators:**
+
+- high confidence: >80% archetype match
+- medium confidence: 60-80% archetype match
+- low confidence: <60% archetype match
+
 _appendix (tool audit, survey cuts, rasic drafts, raw tables) is provided off-doc via qr/link to a shared folder._

@@ -37,6 +37,7 @@ TEMPLATE_FIELDS = {
     # Metrics
     "overhead_percentage": float,
     "annual_cost": float,
+    "weekly_cost": float,
     "hours_lost_ppw": float,
     # Context data
     "team_size": int,
@@ -224,6 +225,7 @@ CAMEL_TO_SNAKE_MAP = {
     # Metrics
     "overheadPercentage": "overhead_percentage",
     "annualCost": "annual_cost",
+    "weeklyCost": "weekly_cost",
     "hoursLostPpw": "hours_lost_ppw",
     # Context data
     "teamSize": "team_size",
